@@ -19,6 +19,22 @@
 
 ---
 
+## 架构定稿与重要变更（2025-10 更新）
+
+- 核心架构：前后端 + 链（放弃"无后端/极简后端"）。
+- 前端：Next.js 14、React 18、TypeScript、Tailwind、Neobrutalist UI、Lucide、Wagmi v2、RainbowKit、Viem、Zustand、TanStack Query、React Hot Toast。
+- 后端：Fastify 4、TypeScript、Zod、Prisma ORM、PostgreSQL、Redis（缓存/会话/队列/Socket 适配）、Socket.IO（Redis Adapter 多实例）。
+- 鉴权：SIWE（Sign-In with Ethereum）+ JWT；不默认使用 Privy（可作为可选扩展）。
+- 区块链：Solidity 0.8.20、Foundry、OpenZeppelin；网络优先 Ethereum Sepolia（测试），后续再切主网；SDK 以 Viem 为主（可选 Ethers）。
+- 部署：pnpm Monorepo、Docker Compose + Nginx、Railway（MVP/内测）+ 预留数据库迁移到 Neon/Supabase/Aiven/RDS 的策略。
+- 数据库策略（Railway 阶段）：
+  - 连接与池化：启用 PgBouncer（或 Prisma 连接数限制），API 层指数退避重试。
+  - 备份：开启每日自动备份；收录 `pg_dump/pg_restore` 脚本，按月演练恢复。
+  - 迁移：Prisma `migrate deploy` 作为发布前置步骤；达成阈值（>50GB、>200–300rps、需 PITR/只读副本）时迁移到专业 PG（Neon/Supabase/Aiven/RDS）。
+- Frames：保留后端代理领取与分布式锁/幂等；与外部钱包主路径不冲突。
+
+（以下原文档章节如与本节不一致，以本节为准；后续逐段替换到位）
+
 ## 项目概述
 
 ### 项目定位
