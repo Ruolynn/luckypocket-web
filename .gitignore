@@ -68,7 +68,6 @@ packages/contracts/out/
 packages/contracts/cache/
 forge-artifacts/
 packages/contracts/broadcast/
-packages/contracts/lib/
 
 # Misc
 **/*.tsbuildinfo
