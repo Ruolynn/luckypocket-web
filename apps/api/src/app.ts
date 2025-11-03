@@ -10,13 +10,11 @@ import chainPlugin from './plugins/chain'
 import invitePlugin from './plugins/invite'
 import achievementPlugin from './plugins/achievement'
 import authRoutes from './routes/auth'
-import packetRoutes from './routes/packets'
 import inviteRoutes from './routes/growth/invite'
 import leaderboardRoutes from './routes/growth/leaderboard'
 import achievementRoutes from './routes/growth/achievement'
 import frameRoutes from './routes/frame'
 import linearRoutes from './routes/linear'
-import { startSyncPacketsJob } from './jobs/syncPackets.job'
 import { startRebuildLeaderboardJob } from './jobs/rebuildLeaderboard.job'
 
 export async function buildApp(options?: { withJobs?: boolean; withSocket?: boolean }) {
@@ -44,7 +42,6 @@ export async function buildApp(options?: { withJobs?: boolean; withSocket?: bool
   app.get('/health', async () => ({ status: 'ok', timestamp: new Date().toISOString() }))
 
   await app.register(authRoutes)
-  await app.register(packetRoutes)
   await app.register(inviteRoutes)
   await app.register(leaderboardRoutes)
   await app.register(achievementRoutes)
@@ -52,7 +49,6 @@ export async function buildApp(options?: { withJobs?: boolean; withSocket?: bool
   await app.register(linearRoutes)
 
   if (options?.withJobs) {
-    await startSyncPacketsJob(app)
     await startRebuildLeaderboardJob(app)
   }
 

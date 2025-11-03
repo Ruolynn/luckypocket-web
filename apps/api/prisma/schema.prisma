@@ -17,11 +17,7 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  // RedPacket relations (legacy)
-  createdPackets Packet[] @relation("CreatedPackets")
-  claims         Claim[]
-
-  // DeGift relations (new)
+  // Gift relations
   sentGifts     Gift[]      @relation("SentGifts")
   receivedGifts Gift[]      @relation("ReceivedGifts")
   giftClaims    GiftClaim[]
@@ -41,54 +37,6 @@ model User {
   @@index([farcasterFid])
   @@index([inviteCode])
   @@map("users")
-}
-
-model Packet {
-  id              String   @id @default(cuid())
-  packetId        String   @unique
-  txHash          String   @unique
-  creatorId       String
-  creator         User     @relation("CreatedPackets", fields: [creatorId], references: [id])
-  token           String
-  tokenSymbol     String? // 代币 symbol 快照（防止代币后续变更影响展示）
-  tokenDecimals   Int? // 代币 decimals 快照
-  tokenName       String? // 代币 name 快照
-  totalAmount     String
-  count           Int
-  isRandom        Boolean
-  message         String?  @db.VarChar(200)
-  remainingAmount String
-  remainingCount  Int
-  expireTime      DateTime
-  refunded        Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  claims          Claim[]
-
-  @@index([creatorId])
-  @@index([expireTime])
-  @@index([createdAt])
-  @@index([packetId])
-  @@map("packets")
-}
-
-model Claim {
-  id        String   @id @default(cuid())
-  packetId  String
-  packet    Packet   @relation(fields: [packetId], references: [id], onDelete: Cascade)
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  amount    String
-  txHash    String   @unique
-  isBest    Boolean  @default(false)
-  claimedAt DateTime @default(now())
-
-  @@unique([packetId, userId])
-  @@index([packetId])
-  @@index([userId])
-  @@index([claimedAt])
-  @@index([isBest])
-  @@map("claims")
 }
 
 model Invitation {
