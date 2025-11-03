@@ -7,11 +7,16 @@ optimizer = true
 optimizer_runs = 200
 via_ir = true
 
+# RPC endpoints
+[rpc_endpoints]
+sepolia = "${SEPOLIA_RPC_URL}"
+base_sepolia = "${BASE_SEPOLIA_RPC_URL}"
+
+# Etherscan API keys for contract verification
 [etherscan]
 sepolia = { key = "${ETHERSCAN_API_KEY}" }
-# 支持 Base Sepolia (如果需要)
-# base_sepolia = { key = "${ETHERSCAN_API_KEY}" }
+base_sepolia = { key = "${BASESCAN_API_KEY}", url = "https://api-sepolia.basescan.org/api" }
 
-# 通用 Etherscan API Key（用于所有支持的网络）
+# Fallback for networks not explicitly configured
 etherscan = { key = "${ETHERSCAN_API_KEY}" }
 
