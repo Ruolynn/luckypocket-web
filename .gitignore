@@ -72,3 +72,4 @@ packages/contracts/broadcast/
 # Misc
 **/*.tsbuildinfo
 **/.tscache/
+.DS_Store
