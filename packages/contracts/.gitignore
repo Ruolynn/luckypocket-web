@@ -1,5 +1,42 @@
+# Foundry files
 cache/
 out/
-# Note: We want to track .sol files in src/ and test/
-# Only ignore generated or temporary .sol files if needed
+broadcast/*/dry-run/
+
+# Environment and secrets
 .env
+.env.local
+*.key
+*.secret
+
+# Deployment artifacts (optional - uncomment if you don't want to track)
+# broadcast/
+
+# Node.js
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Editor and IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+coverage/
+coverage.json
+.coverage_artifacts/
+.coverage_cache/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+deployment-*.txt

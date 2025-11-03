@@ -48,18 +48,15 @@ contract DeployDeGift is Script {
         console.log("forge verify-contract", address(deGift), "src/DeGift.sol:DeGift --chain-id", block.chainid);
         console.log("===========================================");
 
-        // Write deployment info to file for reference
-        string memory deploymentInfo = string.concat(
-            "DeGift Contract Deployment\n",
-            "==========================\n",
-            "Chain ID: ", vm.toString(block.chainid), "\n",
-            "Deployer: ", vm.toString(deployer), "\n",
-            "Contract: ", vm.toString(address(deGift)), "\n",
-            "Block: ", vm.toString(block.number), "\n",
-            "Timestamp: ", vm.toString(block.timestamp), "\n"
-        );
-
-        vm.writeFile("deployment-degift.txt", deploymentInfo);
-        console.log("Deployment info saved to: deployment-degift.txt");
+        // Log deployment info (writeFile disabled due to permissions)
+        console.log("");
+        console.log("Deployment Summary:");
+        console.log("Chain ID:", block.chainid);
+        console.log("Deployer:", deployer);
+        console.log("Contract:", address(deGift));
+        console.log("Block:", block.number);
+        console.log("Timestamp:", block.timestamp);
+        console.log("");
+        console.log("Save this information for your records!");
     }
 }
