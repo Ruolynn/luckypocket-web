@@ -100,8 +100,8 @@ async function createETHGift(
     const hash = await walletClient.writeContract({
       address: DEGIFT_CONTRACT,
       abi: DeGiftAbi,
-      functionName: 'createGiftETH',
-      args: [recipient, expiresAt, message],
+      functionName: 'createGift',
+      args: [recipient, '0x0000000000000000000000000000000000000000', 0n, message, expiresAt],
       value: amountWei,
     })
 
@@ -193,8 +193,8 @@ async function createERC20Gift(
     const hash = await walletClient.writeContract({
       address: DEGIFT_CONTRACT,
       abi: DeGiftAbi,
-      functionName: 'createGiftERC20',
-      args: [recipient, tokenAddress, amountWei, expiresAt, message],
+      functionName: 'createGift',
+      args: [recipient, tokenAddress, amountWei, message, expiresAt],
     })
 
     console.log(`   Transaction hash: ${hash}`)

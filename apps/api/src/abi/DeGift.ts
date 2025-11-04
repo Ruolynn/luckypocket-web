@@ -1,163 +1,555 @@
 /**
  * @file DeGift Contract ABI
  * @description ABI for DeGift smart contract (EIP-4361 compliant gift system)
+ * @generated Generated from Foundry compilation output
  */
 
 export const DeGiftAbi = [
-  // ============================================
-  // Events
-  // ============================================
   {
-    type: 'event',
-    name: 'GiftCreated',
-    inputs: [
-      { name: 'giftId', type: 'bytes32', indexed: true },
-      { name: 'sender', type: 'address', indexed: true },
-      { name: 'recipient', type: 'address', indexed: true },
-      { name: 'tokenType', type: 'uint8', indexed: false }, // 0=ETH, 1=ERC20, 2=ERC721, 3=ERC1155
-      { name: 'token', type: 'address', indexed: false },
-      { name: 'tokenId', type: 'uint256', indexed: false },
-      { name: 'amount', type: 'uint256', indexed: false },
-      { name: 'expiresAt', type: 'uint256', indexed: false },
-      { name: 'message', type: 'string', indexed: false },
-    ],
-  },
-  {
-    type: 'event',
-    name: 'GiftClaimed',
-    inputs: [
-      { name: 'giftId', type: 'bytes32', indexed: true },
-      { name: 'recipient', type: 'address', indexed: true },
-      { name: 'amount', type: 'uint256', indexed: false },
-    ],
-  },
-  {
-    type: 'event',
-    name: 'GiftRefunded',
-    inputs: [
-      { name: 'giftId', type: 'bytes32', indexed: true },
-      { name: 'sender', type: 'address', indexed: true },
-      { name: 'amount', type: 'uint256', indexed: false },
-    ],
-  },
-
-  // ============================================
-  // Functions
-  // ============================================
-
-  // Create ETH gift
-  {
-    type: 'function',
-    name: 'createGiftETH',
-    stateMutability: 'payable',
-    inputs: [
-      { name: 'recipient', type: 'address' },
-      { name: 'expiresAt', type: 'uint256' },
-      { name: 'message', type: 'string' },
-    ],
-    outputs: [{ name: 'giftId', type: 'bytes32' }],
-  },
-
-  // Create ERC20 gift
-  {
-    type: 'function',
-    name: 'createGiftERC20',
-    stateMutability: 'nonpayable',
-    inputs: [
-      { name: 'recipient', type: 'address' },
-      { name: 'token', type: 'address' },
-      { name: 'amount', type: 'uint256' },
-      { name: 'expiresAt', type: 'uint256' },
-      { name: 'message', type: 'string' },
-    ],
-    outputs: [{ name: 'giftId', type: 'bytes32' }],
-  },
-
-  // Create ERC721 gift
-  {
-    type: 'function',
-    name: 'createGiftERC721',
-    stateMutability: 'nonpayable',
-    inputs: [
-      { name: 'recipient', type: 'address' },
-      { name: 'token', type: 'address' },
-      { name: 'tokenId', type: 'uint256' },
-      { name: 'expiresAt', type: 'uint256' },
-      { name: 'message', type: 'string' },
-    ],
-    outputs: [{ name: 'giftId', type: 'bytes32' }],
-  },
-
-  // Create ERC1155 gift
-  {
-    type: 'function',
-    name: 'createGiftERC1155',
-    stateMutability: 'nonpayable',
-    inputs: [
-      { name: 'recipient', type: 'address' },
-      { name: 'token', type: 'address' },
-      { name: 'tokenId', type: 'uint256' },
-      { name: 'amount', type: 'uint256' },
-      { name: 'expiresAt', type: 'uint256' },
-      { name: 'message', type: 'string' },
-    ],
-    outputs: [{ name: 'giftId', type: 'bytes32' }],
-  },
-
-  // Claim gift
-  {
-    type: 'function',
-    name: 'claimGift',
-    stateMutability: 'nonpayable',
-    inputs: [{ name: 'giftId', type: 'bytes32' }],
-    outputs: [],
-  },
-
-  // Refund gift (only sender after expiry)
-  {
-    type: 'function',
-    name: 'refundGift',
-    stateMutability: 'nonpayable',
-    inputs: [{ name: 'giftId', type: 'bytes32' }],
-    outputs: [],
-  },
-
-  // Get gift info
-  {
-    type: 'function',
-    name: 'getGift',
-    stateMutability: 'view',
-    inputs: [{ name: 'giftId', type: 'bytes32' }],
-    outputs: [
+    "type": "function",
+    "name": "claimGift",
+    "inputs": [
       {
-        name: '',
-        type: 'tuple',
-        components: [
-          { name: 'sender', type: 'address' },
-          { name: 'recipient', type: 'address' },
-          { name: 'tokenType', type: 'uint8' },
-          { name: 'token', type: 'address' },
-          { name: 'tokenId', type: 'uint256' },
-          { name: 'amount', type: 'uint256' },
-          { name: 'expiresAt', type: 'uint256' },
-          { name: 'claimed', type: 'bool' },
-          { name: 'refunded', type: 'bool' },
-        ],
-      },
+        "name": "giftId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
     ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
   },
-
-  // Check if gift can be claimed
   {
-    type: 'function',
-    name: 'canClaim',
-    stateMutability: 'view',
-    inputs: [
-      { name: 'giftId', type: 'bytes32' },
-      { name: 'claimer', type: 'address' },
+    "type": "function",
+    "name": "createGift",
+    "inputs": [
+      {
+        "name": "recipient",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "token",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "message",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "expiresAt",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
     ],
-    outputs: [{ name: '', type: 'bool' }],
+    "outputs": [
+      {
+        "name": "giftId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "payable"
   },
+  {
+    "type": "function",
+    "name": "createNFTGift",
+    "inputs": [
+      {
+        "name": "recipient",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "tokenType",
+        "type": "uint8",
+        "internalType": "enum DeGift.TokenType"
+      },
+      {
+        "name": "token",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "tokenId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "message",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "expiresAt",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "giftId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "getGift",
+    "inputs": [
+      {
+        "name": "giftId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "gift",
+        "type": "tuple",
+        "internalType": "struct DeGift.Gift",
+        "components": [
+          {
+            "name": "id",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "sender",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "recipient",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "tokenType",
+            "type": "uint8",
+            "internalType": "enum DeGift.TokenType"
+          },
+          {
+            "name": "token",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "tokenId",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "amount",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "message",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "createdAt",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "expiresAt",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "status",
+            "type": "uint8",
+            "internalType": "enum DeGift.GiftStatus"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getTotalGifts",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "giftExists",
+    "inputs": [
+      {
+        "name": "giftId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "exists",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "onERC1155BatchReceived",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "onERC1155Received",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "onERC721Received",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "refundGift",
+    "inputs": [
+      {
+        "name": "giftId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "supportsInterface",
+    "inputs": [
+      {
+        "name": "interfaceId",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "event",
+    "name": "GiftClaimed",
+    "inputs": [
+      {
+        "name": "giftId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "claimer",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "tokenType",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "enum DeGift.TokenType"
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "GiftCreated",
+    "inputs": [
+      {
+        "name": "giftId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "sender",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "recipient",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "tokenType",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "enum DeGift.TokenType"
+      },
+      {
+        "name": "token",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "tokenId",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "GiftRefunded",
+    "inputs": [
+      {
+        "name": "giftId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "sender",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "tokenType",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "enum DeGift.TokenType"
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "error",
+    "name": "ERC721AmountMustBeOne",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "GiftAlreadyClaimed",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "GiftExpired",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "GiftNotExpired",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "GiftNotFound",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidAmount",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidExpiration",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidRecipient",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidTokenAddress",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidTokenId",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidTokenType",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "NotGiftRecipient",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "NotGiftSender",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "ReentrancyGuardReentrantCall",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "SafeERC20FailedOperation",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "address",
+        "internalType": "address"
+      }
+    ]
+  }
 ] as const
 
 // ERC20 ABI (minimal - for approve and balanceOf)
