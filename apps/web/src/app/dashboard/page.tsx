@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { MainLayout } from '@/components/MainLayout'
 import Link from 'next/link'
-import { PacketCard } from '@/components/PacketCard'
 
 type FilterType = 'all' | 'sent' | 'received'
 type StatusType = 'all' | 'claimed' | 'unclaimed' | 'expired'
