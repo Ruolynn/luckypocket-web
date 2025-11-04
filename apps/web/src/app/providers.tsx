@@ -3,25 +3,36 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { WagmiProvider } from 'wagmi'
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit'
-import { getDefaultConfig } from '@rainbow-me/rainbowkit'
-import { base, baseSepolia } from 'wagmi/chains'
+import { Toaster } from 'sonner'
+import { wagmiConfig } from '@/lib/wagmi/config'
 import '@rainbow-me/rainbowkit/styles.css'
 import { useState } from 'react'
 
-const config = getDefaultConfig({
-  appName: 'LuckyPacket',
-  projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || 'YOUR_PROJECT_ID',
-  chains: [base, baseSepolia],
-  ssr: true,
-})
-
-export function Providers({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient())
+export function Providers({ children }: { children: React.ReactNode}) {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 60 * 1000, // 1 minute
+            refetchOnWindowFocus: false,
+          },
+        },
+      })
+  )
 
   return (
-    <WagmiProvider config={config}>
+    <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider>{children}</RainbowKitProvider>
+        <RainbowKitProvider>
+          <Toaster
+            position="top-right"
+            richColors
+            closeButton
+            duration={4000}
+          />
+          {children}
+        </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
   )
