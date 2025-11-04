@@ -56,6 +56,17 @@ async function getIssueByIdentifier(identifier: string) {
           id
           name
         }
+        comments {
+          nodes {
+            id
+            body
+            createdAt
+            user {
+              name
+              email
+            }
+          }
+        }
         createdAt
         updatedAt
       }
@@ -104,6 +115,17 @@ async function getIssueByIdentifier(identifier: string) {
             project {
               id
               name
+            }
+            comments {
+              nodes {
+                id
+                body
+                createdAt
+                user {
+                  name
+                  email
+                }
+              }
             }
             createdAt
             updatedAt
@@ -169,6 +191,19 @@ async function main() {
 
     console.log(`\n📅 Created: ${new Date(issue.createdAt).toLocaleString()}`)
     console.log(`📅 Updated: ${new Date(issue.updatedAt).toLocaleString()}`)
+
+    // Display comments
+    if (issue.comments?.nodes?.length > 0) {
+      console.log(`\n💬 Comments (${issue.comments.nodes.length}):`)
+      console.log('━'.repeat(60))
+      issue.comments.nodes.forEach((comment: any, index: number) => {
+        console.log(`\n[${index + 1}] ${comment.user.name} - ${new Date(comment.createdAt).toLocaleString()}`)
+        console.log(comment.body)
+        console.log('─'.repeat(60))
+      })
+    } else {
+      console.log(`\n💬 Comments: None`)
+    }
 
     console.log('\n✅ Done\n')
   } catch (error: any) {

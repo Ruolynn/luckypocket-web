@@ -245,6 +245,18 @@ apps/api/test-*.js
 scripts/test-*.ts
 scripts/test-*.js
 
+# Linear/Review temporary files
+/tmp/*linear*.json
+/tmp/*zens*.json
+/tmp/*zens*.js
+/tmp/*claude*.json
+/tmp/*claude*.sh
+/tmp/query*.py
+/tmp/update*.py
+/tmp/approve*.js
+/tmp/query*.js
+/tmp/fix*.sh
+
 # ------------------------------------------------------------------------------
 # Security & Sensitive Data
 # ------------------------------------------------------------------------------
