@@ -10,12 +10,14 @@ import chainPlugin from './plugins/chain'
 import invitePlugin from './plugins/invite'
 import achievementPlugin from './plugins/achievement'
 import authRoutes from './routes/auth'
+import giftsRoutes from './routes/gifts'
 import inviteRoutes from './routes/growth/invite'
 import leaderboardRoutes from './routes/growth/leaderboard'
 import achievementRoutes from './routes/growth/achievement'
 import frameRoutes from './routes/frame'
 import linearRoutes from './routes/linear'
 import { startRebuildLeaderboardJob } from './jobs/rebuildLeaderboard.job'
+import { startSyncGiftsJob } from './jobs/syncGifts.job'
 
 export async function buildApp(options?: { withJobs?: boolean; withSocket?: boolean }) {
   const app = Fastify({ logger: false })
@@ -42,6 +44,7 @@ export async function buildApp(options?: { withJobs?: boolean; withSocket?: bool
   app.get('/health', async () => ({ status: 'ok', timestamp: new Date().toISOString() }))
 
   await app.register(authRoutes)
+  await app.register(giftsRoutes)
   await app.register(inviteRoutes)
   await app.register(leaderboardRoutes)
   await app.register(achievementRoutes)
@@ -50,6 +53,7 @@ export async function buildApp(options?: { withJobs?: boolean; withSocket?: bool
 
   if (options?.withJobs) {
     await startRebuildLeaderboardJob(app)
+    await startSyncGiftsJob(app)
   }
 
   return app
