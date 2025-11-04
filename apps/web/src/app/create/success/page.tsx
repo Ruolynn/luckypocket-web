@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { MainLayout } from '@/components/MainLayout'
 import { useSearchParams } from 'next/navigation'
 
-export default function CreateSuccessPage() {
+function CreateSuccessContent() {
   const searchParams = useSearchParams()
   const packetId = searchParams.get('id') || '0x1234567890abcdef1234567890abcdef12345678'
   const [qrModalOpen, setQrModalOpen] = useState(false)
@@ -228,6 +228,20 @@ export default function CreateSuccessPage() {
         </div>
       )}
     </MainLayout>
+  )
+}
+
+export default function CreateSuccessPage() {
+  return (
+    <Suspense fallback={
+      <MainLayout>
+        <div className="flex flex-col items-center justify-center py-8 xs:py-12 sm:py-16 px-3 xs:px-4">
+          <div className="text-lg text-text-secondary-light">Loading...</div>
+        </div>
+      </MainLayout>
+    }>
+      <CreateSuccessContent />
+    </Suspense>
   )
 }
 
