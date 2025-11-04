@@ -18,7 +18,7 @@ interface Notification {
 
 export default function NotificationsPage() {
   const [filter, setFilter] = useState<NotificationType>('all')
-  const [notifications, setNotifications] = useState<Notification[]>([
+  const [notifications] = useState<Notification[]>([
     {
       id: '1',
       type: 'claim',
