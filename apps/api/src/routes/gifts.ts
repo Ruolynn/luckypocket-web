@@ -11,8 +11,9 @@ import { siweAuthMiddleware, optionalAuthMiddleware } from '../middleware/siwe-a
 // Request schemas
 const CreateGiftSchema = z.object({
   recipientAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/, 'Invalid Ethereum address'),
-  tokenType: z.enum(['ETH', 'ERC20']),
+  tokenType: z.enum(['ETH', 'ERC20', 'ERC721', 'ERC1155']),
   tokenAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/).optional(),
+  tokenId: z.string().regex(/^\d+$/, 'Invalid token ID').optional(),
   amount: z.string().regex(/^\d+(\.\d+)?$/, 'Invalid amount'),
   daysUntilExpiry: z.number().int().min(1).max(365),
   message: z.string().max(500).optional(),
@@ -50,8 +51,9 @@ const plugin: FastifyPluginAsync = async (app) => {
           required: ['recipientAddress', 'tokenType', 'amount', 'daysUntilExpiry'],
           properties: {
             recipientAddress: { type: 'string' },
-            tokenType: { type: 'string', enum: ['ETH', 'ERC20'] },
+            tokenType: { type: 'string', enum: ['ETH', 'ERC20', 'ERC721', 'ERC1155'] },
             tokenAddress: { type: 'string' },
+            tokenId: { type: 'string' },
             amount: { type: 'string' },
             daysUntilExpiry: { type: 'number' },
             message: { type: 'string' },
@@ -81,11 +83,27 @@ const plugin: FastifyPluginAsync = async (app) => {
         // Validate request body
         const body = CreateGiftSchema.parse(request.body)
 
-        // Validate ERC20 requires tokenAddress
-        if (body.tokenType === 'ERC20' && !body.tokenAddress) {
+        // Validate token-specific requirements
+        if ((body.tokenType === 'ERC20' || body.tokenType === 'ERC721' || body.tokenType === 'ERC1155') && !body.tokenAddress) {
           return reply.code(400).send({
             error: 'VALIDATION_ERROR',
-            message: 'tokenAddress is required for ERC20 gifts',
+            message: `tokenAddress is required for ${body.tokenType} gifts`,
+          })
+        }
+
+        // Validate NFT requires tokenId
+        if ((body.tokenType === 'ERC721' || body.tokenType === 'ERC1155') && !body.tokenId) {
+          return reply.code(400).send({
+            error: 'VALIDATION_ERROR',
+            message: `tokenId is required for ${body.tokenType} gifts`,
+          })
+        }
+
+        // Validate ERC721 amount must be 1
+        if (body.tokenType === 'ERC721' && body.amount !== '1') {
+          return reply.code(400).send({
+            error: 'VALIDATION_ERROR',
+            message: 'ERC721 gifts must have amount = 1',
           })
         }
 
@@ -509,6 +527,130 @@ const plugin: FastifyPluginAsync = async (app) => {
         return reply.code(500).send({
           error: 'INTERNAL_ERROR',
           message: 'Failed to record claim',
+        })
+      }
+    }
+  )
+
+  /**
+   * POST /api/v1/gifts/:giftId/refund
+   * Refund an expired gift
+   * Requires authentication - only sender can refund
+   */
+  app.post(
+    '/api/v1/gifts/:giftId/refund',
+    {
+      preHandler: siweAuthMiddleware,
+      schema: {
+        description: 'Refund an expired gift',
+        tags: ['gifts'],
+        security: [{ bearerAuth: [] }],
+        params: {
+          type: 'object',
+          properties: {
+            giftId: { type: 'string' },
+          },
+          required: ['giftId'],
+        },
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              success: { type: 'boolean' },
+              txHash: { type: 'string' },
+            },
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      try {
+        if (!request.user) {
+          return reply.code(401).send({
+            error: 'UNAUTHORIZED',
+            message: 'Authentication required',
+          })
+        }
+
+        const { giftId } = request.params as { giftId: string }
+
+        // Get gift from database to verify ownership
+        const gift = await giftService.getGift(giftId)
+
+        if (!gift) {
+          return reply.code(404).send({
+            error: 'NOT_FOUND',
+            message: 'Gift not found',
+          })
+        }
+
+        // Verify sender owns this gift
+        if (gift.sender.address.toLowerCase() !== request.user.address.toLowerCase()) {
+          return reply.code(403).send({
+            error: 'FORBIDDEN',
+            message: 'Only the sender can refund this gift',
+          })
+        }
+
+        // Check if gift is expired
+        if (new Date() <= gift.expiresAt) {
+          return reply.code(400).send({
+            error: 'NOT_EXPIRED',
+            message: 'Gift has not expired yet',
+          })
+        }
+
+        // Check if gift is still pending
+        if (gift.status !== 'PENDING') {
+          return reply.code(400).send({
+            error: 'INVALID_STATUS',
+            message: `Gift status is ${gift.status}, can only refund PENDING gifts`,
+          })
+        }
+
+        // Call contract to refund
+        const result = await giftService.refundGift(giftId)
+
+        return reply.code(200).send({
+          success: true,
+          txHash: result.txHash,
+        })
+      } catch (error: any) {
+        app.log.error({ error }, 'Failed to refund gift')
+
+        const errorMessage = error.message || 'Unknown error'
+
+        if (errorMessage.includes('GiftNotFound')) {
+          return reply.code(404).send({
+            error: 'NOT_FOUND',
+            message: 'Gift not found on blockchain',
+          })
+        }
+
+        if (errorMessage.includes('NotGiftSender')) {
+          return reply.code(403).send({
+            error: 'FORBIDDEN',
+            message: 'Only the sender can refund this gift',
+          })
+        }
+
+        if (errorMessage.includes('GiftNotExpired')) {
+          return reply.code(400).send({
+            error: 'NOT_EXPIRED',
+            message: 'Gift has not expired yet',
+          })
+        }
+
+        if (errorMessage.includes('GiftAlreadyClaimed')) {
+          return reply.code(400).send({
+            error: 'ALREADY_CLAIMED',
+            message: 'Gift has already been claimed',
+          })
+        }
+
+        return reply.code(500).send({
+          error: 'INTERNAL_ERROR',
+          message: 'Failed to refund gift',
         })
       }
     }

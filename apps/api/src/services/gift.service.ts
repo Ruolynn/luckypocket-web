@@ -19,8 +19,9 @@ import { DeGiftAbi, ERC20Abi } from '../abi/DeGift'
 
 export interface CreateGiftParams {
   recipientAddress: string
-  tokenType: 'ETH' | 'ERC20'
+  tokenType: 'ETH' | 'ERC20' | 'ERC721' | 'ERC1155'
   tokenAddress?: string
+  tokenId?: string
   amount: string
   daysUntilExpiry: number
   message?: string
@@ -59,6 +60,7 @@ export class GiftService {
       recipientAddress,
       tokenType,
       tokenAddress,
+      tokenId,
       amount,
       daysUntilExpiry,
       message = '',
@@ -102,8 +104,8 @@ export class GiftService {
         txHash = await walletClient.writeContract({
           address: DEGIFT_CONTRACT,
           abi: DeGiftAbi,
-          functionName: 'createGiftETH',
-          args: [recipientAddress as Address, expiresAt, message],
+          functionName: 'createGift',
+          args: [recipientAddress as Address, '0x0000000000000000000000000000000000000000' as Address, amountWei, message, expiresAt],
           value: amountWei,
         })
       } else if (tokenType === 'ERC20') {
@@ -138,8 +140,36 @@ export class GiftService {
         txHash = await walletClient.writeContract({
           address: DEGIFT_CONTRACT,
           abi: DeGiftAbi,
-          functionName: 'createGiftERC20',
-          args: [recipientAddress as Address, tokenAddress as Address, amountWei, expiresAt, message],
+          functionName: 'createGift',
+          args: [recipientAddress as Address, tokenAddress as Address, amountWei, message, expiresAt],
+        })
+      } else if (tokenType === 'ERC721' || tokenType === 'ERC1155') {
+        if (!tokenAddress) {
+          throw new Error(`Token address required for ${tokenType} gifts`)
+        }
+        if (!tokenId) {
+          throw new Error(`Token ID required for ${tokenType} gifts`)
+        }
+
+        amountWei = BigInt(amount)
+
+        // Determine token type enum value (2 for ERC721, 3 for ERC1155)
+        const tokenTypeEnum = tokenType === 'ERC721' ? 2 : 3
+
+        // Create NFT gift using createNFTGift
+        txHash = await walletClient.writeContract({
+          address: DEGIFT_CONTRACT,
+          abi: DeGiftAbi,
+          functionName: 'createNFTGift',
+          args: [
+            recipientAddress as Address,
+            tokenTypeEnum,
+            tokenAddress as Address,
+            BigInt(tokenId),
+            amountWei,
+            message,
+            expiresAt,
+          ],
         })
       } else {
         throw new Error(`Unsupported token type: ${tokenType}`)
@@ -670,6 +700,58 @@ export class GiftService {
         totalUsers,
         stats24h,
       },
+    }
+  }
+
+  /**
+   * Refund an expired gift
+   */
+  async refundGift(giftId: string) {
+    // Validate environment
+    const RPC_URL = process.env.ETHEREUM_RPC_URL
+    const PRIVATE_KEY = process.env.PROXY_WALLET_PRIVATE_KEY
+    const DEGIFT_CONTRACT = process.env.DEGIFT_CONTRACT_ADDRESS as Address
+
+    if (!RPC_URL || !PRIVATE_KEY || !DEGIFT_CONTRACT) {
+      throw new Error('Missing blockchain configuration')
+    }
+
+    // Setup clients
+    const account = privateKeyToAccount(PRIVATE_KEY as `0x${string}`)
+
+    const publicClient = createPublicClient({
+      chain: sepolia,
+      transport: http(RPC_URL),
+    })
+
+    const walletClient = createWalletClient({
+      account,
+      chain: sepolia,
+      transport: http(RPC_URL),
+    })
+
+    try {
+      // Call contract refundGift function
+      const txHash = await walletClient.writeContract({
+        address: DEGIFT_CONTRACT,
+        abi: DeGiftAbi,
+        functionName: 'refundGift',
+        args: [BigInt(giftId)],
+      })
+
+      // Wait for transaction
+      const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash })
+
+      if (receipt.status !== 'success') {
+        throw new Error('Transaction failed')
+      }
+
+      return {
+        txHash,
+        blockNumber: receipt.blockNumber,
+      }
+    } catch (error: any) {
+      throw new Error(`Failed to refund gift: ${error.message || error}`)
     }
   }
 }
