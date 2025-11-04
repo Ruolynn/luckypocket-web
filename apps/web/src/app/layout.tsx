@@ -9,10 +9,13 @@ const plusJakarta = Plus_Jakarta_Sans({
   variable: '--font-display',
 })
 
+export const viewport = {
+  themeColor: '#FF4545',
+}
+
 export const metadata: Metadata = {
   title: 'LuckyPacket - Web3 Lucky Packet dApp',
   description: 'Send and claim encrypted lucky packets on Base chain',
-  themeColor: '#FF4545',
 }
 
 export default function RootLayout({
