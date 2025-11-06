@@ -21,22 +21,47 @@ async function gql(query, variables) {
 }
 
 async function getTeamAndStates(teamKey) {
-  // Some Linear plans/APIs expose states via "states" instead of workflowStates
-  const q = `query($first:Int!){ teams(first:$first){nodes{id key name states { nodes { id name } } } } }`
-  const d = await gql(q, { first: 50 })
-  const team = d.teams.nodes.find((t) => t.key === teamKey)
+  // Try multiple ways to get states
+  const q1 = `query($first:Int!){ teams(first:$first){nodes{id key name } } }`
+  const d1 = await gql(q1, { first: 50 })
+  const team = d1.teams.nodes.find((t) => t.key === teamKey)
   if (!team) throw new Error(`Team not found: ${teamKey}`)
-  const states = team.states?.nodes || []
-  if (!states.length) throw new Error('No states retrieved for team')
-  return { teamId: team.id, states }
+
+  // Get workflow states via team's default workflow
+  const q2 = `query($teamId:String!){ team(id:$teamId){ defaultWorkflowState { id name } workflowStates { nodes { id name type } } } }`
+  try {
+    const d2 = await gql(q2, { teamId: team.id })
+    const states = d2.team?.workflowStates?.nodes || []
+    if (states.length) return { teamId: team.id, states }
+  } catch (e) {
+    console.warn('Failed to get workflowStates, trying alternative...')
+  }
+
+  // Fallback: query project states (if project exists)
+  const q3 = `query{ workflowStates(first:50){ nodes { id name type } } }`
+  try {
+    const d3 = await gql(q3, {})
+    const states = d3.workflowStates?.nodes || []
+    if (states.length) return { teamId: team.id, states }
+  } catch (e) {
+    console.warn('Failed to get workflowStates from root query')
+  }
+
+  throw new Error('Could not retrieve workflow states. Please check Linear API permissions.')
 }
 
-async function getIssueId(identifier) {
-  // Fallback: search issues by filter
-  const q = `query($query:String!){ issues(filter:{ query:$query }, first:10){ nodes{ id identifier } } }`
-  const d = await gql(q, { query: identifier })
-  const node = d.issues?.nodes?.find((n) => n.identifier === identifier)
-  return node?.id || null
+async function getIssueId(identifier, teamKey) {
+  // Fallback: query all team issues and filter
+  const q2 = `query($teamKey:String!){ team(key:$teamKey){ issues(first:100){ nodes{ id identifier } } } }`
+  try {
+    const d2 = await gql(q2, { teamKey })
+    const node = d2.team?.issues?.nodes?.find((n) => n.identifier === identifier)
+    if (node) return node.id
+  } catch (e) {
+    console.warn(`Failed to query team issues: ${e.message}`)
+  }
+
+  return null
 }
 
 async function updateIssueState(issueId, stateId) {
@@ -46,37 +71,71 @@ async function updateIssueState(issueId, stateId) {
 }
 
 async function main() {
-  // expected input via env or inline here
-  // Format: IDENTIFIER=STATE_NAME pairs, comma separated
   const updatesArg = process.env.LINEAR_UPDATES || ''
   if (!updatesArg) {
     console.log('No updates provided. Set LINEAR_UPDATES="ZES-172=Done,ZES-174=Done"')
     process.exit(0)
   }
 
-  const { states } = await getTeamAndStates(TEAM_KEY)
-  const stateByName = new Map(states.map((s) => [s.name.toLowerCase(), s.id]))
+  console.log(`Getting team and states for ${TEAM_KEY}...`)
+  let states, stateByName
+  try {
+    const result = await getTeamAndStates(TEAM_KEY)
+    states = result.states
+    stateByName = new Map(states.map((s) => [s.name.toLowerCase(), s.id]))
+    console.log(`Found ${states.length} states: ${states.map((s) => s.name).join(', ')}`)
+  } catch (e) {
+    console.error(`Failed to get states: ${e.message}`)
+    process.exit(1)
+  }
 
   const pairs = updatesArg.split(',').map((p) => p.trim()).filter(Boolean)
+  let successCount = 0
+  let failCount = 0
+
   for (const pair of pairs) {
     const [identifier, stateNameRaw] = pair.split('=')
-    const stateName = (stateNameRaw || '').trim()
+    if (!identifier || !stateNameRaw) {
+      console.error(`Invalid format: ${pair}. Expected: IDENTIFIER=STATE_NAME`)
+      failCount++
+      continue
+    }
+
+    const stateName = stateNameRaw.trim()
     const stateId = stateByName.get(stateName.toLowerCase())
     if (!stateId) {
-      console.error(`State not found: ${stateName}`)
+      console.error(`State not found: "${stateName}". Available: ${states.map((s) => s.name).join(', ')}`)
+      failCount++
       continue
     }
-    const issueId = await getIssueId(identifier.trim())
+
+    console.log(`Looking up issue: ${identifier}...`)
+    const issueId = await getIssueId(identifier.trim(), TEAM_KEY)
     if (!issueId) {
       console.error(`Issue not found: ${identifier}`)
+      failCount++
       continue
     }
-    const res = await updateIssueState(issueId, stateId)
-    if (res?.success) {
-      console.log(`Updated ${identifier} -> ${stateName}`)
-    } else {
-      console.error(`Failed to update ${identifier}`)
+
+    console.log(`Updating ${identifier} to state "${stateName}"...`)
+    try {
+      const res = await updateIssueState(issueId, stateId)
+      if (res?.success) {
+        console.log(`✅ Updated ${identifier} -> ${stateName}`)
+        successCount++
+      } else {
+        console.error(`❌ Failed to update ${identifier}: ${JSON.stringify(res)}`)
+        failCount++
+      }
+    } catch (e) {
+      console.error(`❌ Error updating ${identifier}: ${e.message}`)
+      failCount++
     }
+  }
+
+  console.log(`\nSummary: ${successCount} succeeded, ${failCount} failed`)
+  if (failCount > 0) {
+    process.exit(1)
   }
 }
 
