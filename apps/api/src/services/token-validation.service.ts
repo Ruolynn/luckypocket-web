@@ -34,6 +34,7 @@ export enum TokenRisk {
 export class TokenValidationService {
   private client: ReturnType<typeof createPublicClient>
   private blacklist: Set<string>
+  private whitelist: Set<string>
 
   constructor() {
     this.client = createPublicClient({
@@ -45,6 +46,15 @@ export class TokenValidationService {
     const blacklistStr = process.env.TOKEN_BLACKLIST || ''
     this.blacklist = new Set(
       blacklistStr
+        .split(',')
+        .map((addr) => addr.trim().toLowerCase())
+        .filter(Boolean)
+    )
+
+    // 从环境变量加载白名单
+    const whitelistStr = process.env.TOKEN_WHITELIST || ''
+    this.whitelist = new Set(
+      whitelistStr
         .split(',')
         .map((addr) => addr.trim().toLowerCase())
         .filter(Boolean)
@@ -125,6 +135,34 @@ export class TokenValidationService {
   }
 
   /**
+   * 检查代币是否在白名单中
+   */
+  isWhitelisted(tokenAddress: Address): boolean {
+    return this.whitelist.has(tokenAddress.toLowerCase())
+  }
+
+  /**
+   * 添加代币到黑名单（运行时）
+   */
+  addToBlacklist(tokenAddress: Address): void {
+    this.blacklist.add(tokenAddress.toLowerCase())
+  }
+
+  /**
+   * 添加代币到白名单（运行时）
+   */
+  addToWhitelist(tokenAddress: Address): void {
+    this.whitelist.add(tokenAddress.toLowerCase())
+  }
+
+  /**
+   * 从黑名单移除代币
+   */
+  removeFromBlacklist(tokenAddress: Address): void {
+    this.blacklist.delete(tokenAddress.toLowerCase())
+  }
+
+  /**
    * 评估代币风险
    */
   assessRisks(
@@ -194,13 +232,34 @@ export class TokenValidationService {
    * 完整验证代币
    */
   async validateToken(tokenAddress: Address): Promise<TokenValidationResult> {
-    // 1. 检查黑名单
+    // 1. 检查白名单 - 白名单代币直接通过
+    const isWhitelisted = this.isWhitelisted(tokenAddress)
+    if (isWhitelisted) {
+      // 白名单代币仍然需要获取元数据，但跳过风险检查
+      let metadata = { symbol: null, decimals: null, name: null }
+      try {
+        metadata = await getTokenMetadata(tokenAddress)
+      } catch (error) {
+        // 白名单代币元数据获取失败也允许继续
+      }
+
+      return {
+        isValid: true,
+        isERC20: true,
+        isBlacklisted: false,
+        metadata,
+        risks: [],
+        warnings: ['此代币在白名单中，已跳过严格检查'],
+      }
+    }
+
+    // 2. 检查黑名单
     const isBlacklisted = this.isBlacklisted(tokenAddress)
 
-    // 2. 验证 ERC20 接口
+    // 3. 验证 ERC20 接口
     const isERC20 = await this.validateERC20Interface(tokenAddress)
 
-    // 3. 获取元数据
+    // 4. 获取元数据
     let metadata = { symbol: null, decimals: null, name: null }
     try {
       metadata = await getTokenMetadata(tokenAddress)
@@ -208,13 +267,13 @@ export class TokenValidationService {
       // 如果获取元数据失败，继续验证流程
     }
 
-    // 4. 评估风险
+    // 5. 评估风险
     const risks = this.assessRisks(tokenAddress, metadata)
 
-    // 5. 生成警告
+    // 6. 生成警告
     const warnings = this.generateWarnings(risks, metadata)
 
-    // 6. 判断是否有效
+    // 7. 判断是否有效
     const isValid = isERC20 && !isBlacklisted && risks.length === 0
 
     return {
