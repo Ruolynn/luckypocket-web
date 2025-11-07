@@ -45,7 +45,8 @@ export async function startSyncGiftsJob(app: FastifyInstance) {
           chainId: CHAIN_ID,
           pollingInterval: 4_000, // 4 seconds
         },
-        app.prisma
+        app.prisma,
+        app.io // Pass Socket.IO server for real-time events
       )
 
       // Optional: Sync historical events from a specific block
@@ -71,7 +72,8 @@ export async function startSyncGiftsJob(app: FastifyInstance) {
           chainId: CHAIN_ID,
           pollingInterval: 4_000, // 4 seconds
         },
-        app.prisma
+        app.prisma,
+        app.io // Pass Socket.IO server for real-time events
       )
 
       // Optional: Sync historical RedPacket events from a specific block

@@ -13,6 +13,7 @@ import {
   type WatchContractEventReturnType,
 } from 'viem'
 import { sepolia } from 'viem/chains'
+import type { Server } from 'socket.io'
 import { RedPacketAbi } from '../abi/RedPacket'
 import { getTokenMetadata } from './contract.service'
 
@@ -27,18 +28,28 @@ export class RedPacketListenerService {
   private client: ReturnType<typeof createPublicClient>
   private config: RedPacketListenerConfig
   private prisma: PrismaClient
+  private io: Server | null = null
   private unwatchFunctions: WatchContractEventReturnType[] = []
   private isListening = false
 
-  constructor(config: RedPacketListenerConfig, prisma: PrismaClient) {
+  constructor(config: RedPacketListenerConfig, prisma: PrismaClient, io?: Server) {
     this.config = config
     this.prisma = prisma
+    this.io = io || null
 
     this.client = createPublicClient({
       chain: sepolia,
       transport: http(config.rpcUrl),
       pollingInterval: config.pollingInterval || 4_000, // 4 seconds
     })
+  }
+
+  /**
+   * Set Socket.IO server instance for real-time event emission
+   */
+  setSocketServer(io: Server) {
+    this.io = io
+    console.log('✅ Socket.IO server connected to RedPacketListenerService')
   }
 
   /**
@@ -165,7 +176,7 @@ export class RedPacketListenerService {
         const creatorUser = await this.getOrCreateUser(creator)
 
         // Create packet record in database
-        await this.prisma.packet.create({
+        const newPacket = await this.prisma.packet.create({
           data: {
             packetId: packetId as string,
             txHash: transactionHash as string,
@@ -188,6 +199,32 @@ export class RedPacketListenerService {
         })
 
         console.log(`   ✅ Packet saved to database`)
+
+        // Emit Socket.IO event to packet room
+        if (this.io) {
+          this.io.to(`packet:${packetId}`).emit('packet:created', {
+            packetId: newPacket.packetId,
+            type: newPacket.isRandom ? 'random' : 'equal',
+            totalAmount: newPacket.totalAmount,
+            totalCount: newPacket.count,
+            creatorId: newPacket.creatorId,
+            token: newPacket.token,
+            tokenSymbol: newPacket.tokenSymbol,
+            tokenDecimals: newPacket.tokenDecimals,
+            expireTime: newPacket.expireTime.toISOString(),
+            txHash: newPacket.txHash,
+          })
+
+          // Also emit to creator's personal room for notifications
+          this.io.to(`user:${creatorUser.id}`).emit('notification:packet-created', {
+            packetId: newPacket.packetId,
+            totalAmount: newPacket.totalAmount,
+            tokenSymbol: newPacket.tokenSymbol,
+            count: newPacket.count,
+          })
+
+          console.log(`   📡 Socket events emitted`)
+        }
       } catch (error: any) {
         console.error(`   ❌ Failed to handle PacketCreated event:`, error.message || error)
       }
@@ -227,6 +264,7 @@ export class RedPacketListenerService {
         const newRemaining = currentRemaining - claimAmount
 
         // Update packet and create claim record in transaction
+        let newClaim: any
         await this.prisma.$transaction(async (tx) => {
           // Update packet remaining amounts
           await tx.packet.update({
@@ -238,7 +276,7 @@ export class RedPacketListenerService {
           })
 
           // Create claim record
-          await tx.packetClaim.create({
+          newClaim = await tx.packetClaim.create({
             data: {
               packetId: packet.id,
               claimerId: claimerUser.id,
@@ -251,11 +289,45 @@ export class RedPacketListenerService {
         })
 
         // Update best claim marker if this is a random packet
+        let bestClaimInfo: any = null
         if (packet.isRandom) {
-          await this.updateBestClaimMarker(packet.id)
+          bestClaimInfo = await this.updateBestClaimMarker(packet.id)
         }
 
         console.log(`   ✅ Packet claim saved to database`)
+
+        // Emit Socket.IO event to packet room
+        if (this.io) {
+          this.io.to(`packet:${packetId}`).emit('packet:claimed', {
+            packetId: packet.packetId,
+            claimId: newClaim.id,
+            claimerId: claimerUser.id,
+            claimerAddress: claimerUser.address,
+            claimedAmount: claimAmount.toString(),
+            remainingAmount: newRemaining.toString(),
+            remainingCount: Number(remainingCount),
+            txHash: transactionHash as string,
+          })
+
+          // Emit notification to claimer's personal room
+          this.io.to(`user:${claimerUser.id}`).emit('notification:packet-claimed', {
+            packetId: packet.packetId,
+            amount: claimAmount.toString(),
+            tokenSymbol: packet.tokenSymbol,
+          })
+
+          // If there's a new best claim, emit that event too
+          if (bestClaimInfo) {
+            this.io.to(`packet:${packetId}`).emit('packet:best-updated', {
+              packetId: packet.packetId,
+              bestClaimId: bestClaimInfo.claimId,
+              bestClaimerId: bestClaimInfo.claimerId,
+              bestAmount: bestClaimInfo.amount,
+            })
+          }
+
+          console.log(`   📡 Socket events emitted`)
+        }
       } catch (error: any) {
         console.error(`   ❌ Failed to handle PacketClaimed event:`, error.message || error)
       }
@@ -326,15 +398,36 @@ export class RedPacketListenerService {
           continue
         }
 
-        // Mark packet as random ready
-        await this.prisma.packet.update({
+        // Mark packet as random ready and get total claims
+        const updatedPacket = await this.prisma.packet.update({
           where: { id: packet.id },
           data: {
             randomReady: true,
           },
+          include: {
+            claims: true,
+          },
         })
 
         console.log(`   ✅ Packet marked as random ready`)
+
+        // Emit Socket.IO event to packet room
+        if (this.io) {
+          // Get the best claim info
+          const bestClaim = updatedPacket.claims.reduce((best, claim) => {
+            return BigInt(claim.amount) > BigInt(best.amount) ? claim : best
+          }, updatedPacket.claims[0])
+
+          this.io.to(`packet:${packetId}`).emit('packet:random-ready', {
+            packetId: updatedPacket.packetId,
+            totalClaimed: updatedPacket.claims.length,
+            bestClaimId: bestClaim?.id,
+            bestClaimerId: bestClaim?.claimerId,
+            bestAmount: bestClaim?.amount,
+          })
+
+          console.log(`   📡 Socket event emitted`)
+        }
       } catch (error: any) {
         console.error(`   ❌ Failed to handle PacketRandomReady event:`, error.message || error)
       }
@@ -344,8 +437,13 @@ export class RedPacketListenerService {
   /**
    * Update "best claim" marker (手气最佳) for a packet
    * Only the claim with the highest amount gets marked as isBest
+   * Returns the best claim info for Socket emission
    */
-  private async updateBestClaimMarker(packetId: string) {
+  private async updateBestClaimMarker(packetId: string): Promise<{
+    claimId: string
+    claimerId: string
+    amount: string
+  } | null> {
     try {
       // Get all claims for this packet
       const claims = await this.prisma.packetClaim.findMany({
@@ -353,7 +451,7 @@ export class RedPacketListenerService {
         orderBy: { amount: 'desc' },
       })
 
-      if (claims.length === 0) return
+      if (claims.length === 0) return null
 
       // Reset all isBest flags first
       await this.prisma.packetClaim.updateMany({
@@ -374,8 +472,16 @@ export class RedPacketListenerService {
       })
 
       console.log(`   💰 Updated best claim marker (highest: ${highestAmount})`)
+
+      // Return the best claim info
+      return {
+        claimId: claims[0].id,
+        claimerId: claims[0].claimerId,
+        amount: claims[0].amount,
+      }
     } catch (error: any) {
       console.error(`   ⚠️  Failed to update best claim marker:`, error.message || error)
+      return null
     }
   }
 

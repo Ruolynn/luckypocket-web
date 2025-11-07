@@ -13,6 +13,7 @@ import {
   type WatchContractEventReturnType,
 } from 'viem'
 import { sepolia } from 'viem/chains'
+import type { Server } from 'socket.io'
 import { DeGiftAbi } from '../abi/DeGift'
 import { TokenType, GiftStatus } from '@prisma/client'
 
@@ -27,18 +28,28 @@ export class EventListenerService {
   private client: ReturnType<typeof createPublicClient>
   private config: EventListenerConfig
   private prisma: PrismaClient
+  private io: Server | null = null
   private unwatchFunctions: WatchContractEventReturnType[] = []
   private isListening = false
 
-  constructor(config: EventListenerConfig, prisma: PrismaClient) {
+  constructor(config: EventListenerConfig, prisma: PrismaClient, io?: Server) {
     this.config = config
     this.prisma = prisma
+    this.io = io || null
 
     this.client = createPublicClient({
       chain: sepolia,
       transport: http(config.rpcUrl),
       pollingInterval: config.pollingInterval || 4_000, // 4 seconds
     })
+  }
+
+  /**
+   * Set Socket.IO server instance for real-time event emission
+   */
+  setSocketServer(io: Server) {
+    this.io = io
+    console.log('✅ Socket.IO server connected to EventListenerService')
   }
 
   /**
@@ -161,7 +172,7 @@ export class EventListenerService {
         }
 
         // Create gift record in database
-        await this.prisma.gift.create({
+        const newGift = await this.prisma.gift.create({
           data: {
             giftId: giftId as string,
             chainId: this.config.chainId,
@@ -184,6 +195,34 @@ export class EventListenerService {
         })
 
         console.log(`   ✅ Gift saved to database`)
+
+        // Emit Socket.IO event to sender's room
+        if (this.io) {
+          this.io.to(`user:${senderUser.id}`).emit('notification:gift-created', {
+            giftId: newGift.giftId,
+            recipientAddress: newGift.recipientAddress,
+            tokenType: newGift.tokenType,
+            amount: newGift.amount,
+            tokenSymbol: newGift.tokenSymbol,
+            message: newGift.message,
+            expiresAt: newGift.expiresAt.toISOString(),
+          })
+
+          // If recipient is specified, emit to recipient's room
+          if (recipientUser) {
+            this.io.to(`user:${recipientUser.id}`).emit('notification:gift-received', {
+              giftId: newGift.giftId,
+              fromAddress: senderUser.address,
+              tokenType: newGift.tokenType,
+              amount: newGift.amount,
+              tokenSymbol: newGift.tokenSymbol,
+              message: newGift.message,
+              expiresAt: newGift.expiresAt.toISOString(),
+            })
+          }
+
+          console.log(`   📡 Socket events emitted`)
+        }
       } catch (error: any) {
         console.error(`   ❌ Failed to handle GiftCreated event:`, error.message || error)
       }
@@ -218,7 +257,7 @@ export class EventListenerService {
         const claimerUser = await this.getOrCreateUser(recipient)
 
         // Update gift status
-        await this.prisma.$transaction([
+        const [updatedGift] = await this.prisma.$transaction([
           // Update gift
           this.prisma.gift.update({
             where: { id: gift.id },
@@ -241,6 +280,27 @@ export class EventListenerService {
         ])
 
         console.log(`   ✅ Gift claim saved to database`)
+
+        // Emit Socket.IO event to claimer's room
+        if (this.io) {
+          this.io.to(`user:${claimerUser.id}`).emit('notification:gift-claimed', {
+            giftId: gift.giftId,
+            amount: amount.toString(),
+            tokenType: gift.tokenType,
+            tokenSymbol: gift.tokenSymbol,
+            message: gift.message,
+          })
+
+          // Also notify the sender (gift creator)
+          this.io.to(`user:${gift.senderId}`).emit('notification:gift-claimed-by-recipient', {
+            giftId: gift.giftId,
+            claimerAddress: claimerUser.address,
+            amount: amount.toString(),
+            tokenSymbol: gift.tokenSymbol,
+          })
+
+          console.log(`   📡 Socket events emitted`)
+        }
       } catch (error: any) {
         console.error(`   ❌ Failed to handle GiftClaimed event:`, error.message || error)
       }
@@ -272,7 +332,7 @@ export class EventListenerService {
         }
 
         // Update gift status
-        await this.prisma.gift.update({
+        const updatedGift = await this.prisma.gift.update({
           where: { id: gift.id },
           data: {
             status: GiftStatus.REFUNDED,
@@ -282,6 +342,19 @@ export class EventListenerService {
         })
 
         console.log(`   ✅ Gift refund saved to database`)
+
+        // Emit Socket.IO event to sender's room
+        if (this.io) {
+          this.io.to(`user:${gift.senderId}`).emit('notification:gift-refunded', {
+            giftId: gift.giftId,
+            amount: gift.amount,
+            tokenType: gift.tokenType,
+            tokenSymbol: gift.tokenSymbol,
+            reason: 'expired',
+          })
+
+          console.log(`   📡 Socket event emitted`)
+        }
       } catch (error: any) {
         console.error(`   ❌ Failed to handle GiftRefunded event:`, error.message || error)
       }
