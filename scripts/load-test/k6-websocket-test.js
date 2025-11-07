@@ -22,7 +22,7 @@ export const options = {
   },
 };
 
-const SOCKET_URL = __ENV.SOCKET_URL || 'http://localhost:3001';
+const SOCKET_URL = __ENV.SOCKET_URL || 'http://localhost:3001/socket.io/?EIO=4&transport=websocket';
 // 注意: k6 的 ws 需要 ws:// 或 wss:// 协议
 const WS_URL = SOCKET_URL.replace(/^http/, 'ws');
 
@@ -30,29 +30,55 @@ export default function () {
   // 模拟 JWT token（实际测试中应使用真实 token）
   const token = __ENV.JWT_TOKEN || 'test-token';
 
-  const response = ws.connect(`${WS_URL}`, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-  }, function (socket) {
+  const authQuery = token ? `${WS_URL}${WS_URL.includes('?') ? '&' : '?'}token=${token}` : WS_URL
+
+  const response = ws.connect(authQuery, {}, function (socket) {
+    let pingInterval = 25000;
+    let namespaceReady = false;
+
     socket.on('open', function () {
       console.log('WebSocket connected');
-      
-      // 订阅红包房间
-      socket.send(JSON.stringify({
-        event: 'subscribe:packet',
-        data: '0x1234567890123456789012345678901234567890123456789012345678901234',
-      }));
-
-      // 发送 ping
-      socket.send(JSON.stringify({ event: 'ping' }));
     });
 
     socket.on('message', function (data) {
-      const msg = JSON.parse(data);
-      check(msg, {
-        'received message': () => msg !== null,
-      });
+      const text = data.toString();
+
+      if (text.startsWith('0')) {
+        // 握手信息，包含 sid 和 ping 配置
+        try {
+          const payload = JSON.parse(text.slice(1));
+          pingInterval = payload.pingInterval || 25000;
+
+          // 进入默认 namespace
+          socket.send('40');
+        } catch (err) {
+          console.log('Handshake parse error', err);
+          errorRate.add(1);
+        }
+      } else if (text === '40') {
+        namespaceReady = true;
+        socket.send(
+          '42["subscribe:packet","0x1234567890123456789012345678901234567890123456789012345678901234"]'
+        );
+      } else if (text === '2') {
+        // 服务器 ping，回复 pong
+        socket.send('3');
+      } else if (text.startsWith('42')) {
+        try {
+          const payload = JSON.parse(text.slice(2));
+          check(payload, {
+            'received message': () => Array.isArray(payload) && payload.length > 0,
+          });
+        } catch (err) {
+          console.log('Failed to parse payload', err);
+          errorRate.add(1);
+        }
+      } else if (text === '3') {
+        // pong
+        return;
+      } else if (text === '41') {
+        console.log('Namespace closed by server');
+      }
     });
 
     socket.on('error', function (e) {
@@ -63,11 +89,6 @@ export default function () {
     socket.on('close', function () {
       console.log('WebSocket closed');
     });
-
-    // 保持连接 30 秒
-    setTimeout(function () {
-      socket.close();
-    }, 30000);
   });
 
   check(response, {

@@ -1,5 +1,5 @@
-import { createWalletClient, createPublicClient, http, parseAbiItem, type Hash, type Address } from 'viem'
-import { privateKeyToAccount, recoverMessageAddress } from 'viem/accounts'
+import { createWalletClient, createPublicClient, http, parseAbiItem, recoverMessageAddress, type Hash, type Address } from 'viem'
+import { privateKeyToAccount } from 'viem/accounts'
 import { sepolia } from 'viem/chains'
 import { getContractAddress } from './chain.service'
 

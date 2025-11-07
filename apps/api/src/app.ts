@@ -26,8 +26,9 @@ export async function buildApp(options?: { withJobs?: boolean; withSocket?: bool
 
   await app.register(cors, { origin: true, credentials: true })
   await app.register(sentryPlugin)
-  // 在测试环境禁用 rateLimit，避免第三方插件导致 hook 异常
-  if (process.env.NODE_ENV !== 'test') {
+  // 在测试环境或压力测试时禁用 rateLimit
+  // 压力测试时通过 DISABLE_RATE_LIMIT 环境变量禁用
+  if (process.env.NODE_ENV !== 'test' && process.env.DISABLE_RATE_LIMIT !== 'true') {
     await app.register(rateLimit, {
       max: Number(process.env.RATE_LIMIT_MAX ?? 120),
       timeWindow: (process.env.RATE_LIMIT_WINDOW_MS as any) ?? '1 minute',
