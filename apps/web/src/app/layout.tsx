@@ -14,8 +14,35 @@ export const viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'LuckyPacket - Web3 Lucky Packet dApp',
-  description: 'Send and claim encrypted lucky packets on Base chain',
+  title: {
+    default: 'Lucky Packet - Web3 Red Envelope dApp',
+    template: '%s | Lucky Packet',
+  },
+  description: 'Send and claim encrypted lucky packets on Base blockchain. Experience the joy of Web3 social payments with festive red envelopes.',
+  keywords: ['lucky packet', 'red envelope', 'hongbao', 'web3', 'base', 'blockchain', 'crypto', 'dapp'],
+  authors: [{ name: 'Zesty Studio' }, { name: 'Ruolynn Chen' }],
+  creator: 'Zesty Studio',
+  publisher: 'Lucky Packet',
+  applicationName: 'Lucky Packet',
+  metadataBase: new URL('https://luckypocket.vercel.app'),
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://luckypocket.vercel.app',
+    title: 'Lucky Packet - Web3 Red Envelope dApp',
+    description: 'Send and claim encrypted lucky packets on Base blockchain. Experience the joy of Web3 social payments with festive red envelopes.',
+    siteName: 'Lucky Packet',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Lucky Packet - Web3 Red Envelope dApp',
+    description: 'Send and claim encrypted lucky packets on Base blockchain.',
+    creator: '@luckypocket',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 }
 
 export default function RootLayout({
