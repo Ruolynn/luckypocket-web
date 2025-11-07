@@ -107,6 +107,7 @@ export default async function packetRoutes(fastify: FastifyInstance) {
         },
         statistics: {
           totalClaimed,
+          remainingCount: packet.remainingCount,
           percentClaimed,
           isFullyClaimed,
           isExpired,
