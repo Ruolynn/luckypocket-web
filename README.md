@@ -1,279 +1,110 @@
-# 🧧 LuckyPocket dApp
+# LuckyPocket - DeGift 礼物功能
 
-Web3 Lucky Packet dApp on Base Chain - Supporting fixed and random amount packets with Farcaster Frames integration.
+去中心化礼物系统，支持发送 Token 和 NFT 作为礼物。
 
-## 📋 Project Structure
+## 🚀 快速启动
 
-```
-luckyPocket/
-├── apps/
-│   ├── api/          # Fastify Backend API (Port 3001)
-│   └── web/          # Next.js Frontend Application (Port 9000)
-├── packages/
-│   ├── contracts/    # Solidity Smart Contracts (Foundry)
-│   ├── config/       # Shared Configurations (Tailwind, TypeScript)
-│   └── ui/           # Shared UI Component Library
-├── docs/             # Project Documentation
-├── archive/          # Legacy Code Backups
-└── design-refs/      # Design Reference Files
-```
+### 端口配置
 
-## 🚀 Quick Start
+| 服务 | 端口 | 说明 |
+|------|------|------|
+| Web 前端 | 9002 | Next.js 开发服务器 |
+| API 后端 | 9001 | Fastify API 服务器 |
 
-### Prerequisites
+> **注意**: 端口 9000 已被 HKD 项目占用
 
-- Node.js 20+
-- pnpm 8+
-- Docker & Docker Compose
-- Foundry (for smart contracts)
+### 启动服务
 
-### Quick Start (Recommended)
-
-1. **启动 Docker 服务**
-   ```bash
-   docker compose up -d
-   ```
-
-2. **运行启动检查脚本**
-   ```bash
-   ./scripts/start-dev.sh
-   ```
-
-3. **启动服务**
-   ```bash
-   # 终端 1: 启动 API
-   cd apps/api
-   pnpm dev
-   
-   # 终端 2: 启动 Web
-   cd apps/web
-   pnpm dev
-   ```
-
-4. **访问应用**
-   - Web: http://localhost:9000
-   - API: http://localhost:3001
-
-### Detailed Setup
-
-详细的本地开发环境配置指南，请查看：
-- [本地启动指南](./LOCAL_SETUP.md) - 完整的本地开发环境配置
-- [环境变量配置](./ENV_SETUP.md) - 环境变量详细说明
-
-### Manual Setup
-
-**1. Environment Setup**
-
-```bash
-# 配置 API 环境变量
-cd apps/api
-# 创建 .env 文件（参考 ENV_SETUP.md）
-
-# 配置 Web 环境变量
-cd ../web
-# 创建 .env.local 文件
-```
-
-**2. Install Dependencies**
-
-```bash
-pnpm install
-```
-
-**3. Database Initialization**
-
-```bash
-cd apps/api
-pnpm prisma:generate
-pnpm prisma:migrate
-```
-
-**4. Start Services**
-
-Backend API:
+**终端 1 - 启动 API**:
 ```bash
 cd apps/api
 pnpm dev
-# Running on http://localhost:3001
 ```
 
-Frontend Web:
+**终端 2 - 启动 Web**:
 ```bash
 cd apps/web
 pnpm dev
-# Running on http://localhost:9000
 ```
 
-## 📦 Deployment
+### 访问应用
 
-### Smart Contracts
+- 🌐 Web 应用: http://localhost:9002
+- 🎁 创建礼物: http://localhost:9002/gift/create
+- 📋 礼物列表: http://localhost:9002/gifts
 
-```bash
-cd packages/contracts
-forge build
-forge script script/Deploy.s.sol:DeployScript --rpc-url $ETHEREUM_RPC_URL --broadcast --verify
-```
+## 📚 文档
 
-**VRF Configuration (Random Packets)**:
-- Current version uses development placeholder (`fulfillRandomForPacket` function, Owner manually fills)
-- Production-ready Chainlink VRF integration available
-- For production deployment:
-  - Create VRF Subscription on target chain and fund it
-  - Configure environment variables: `VRF_COORDINATOR`, `VRF_KEY_HASH`, `VRF_SUBSCRIPTION_ID`, `DEV_MODE`
-  - Contract requests random number on `createPacket`, receives callback via `fulfillRandomWords`
-  - Set `DEV_MODE=true` to enable Owner manual fallback (development)
+- [快速启动指南](./docs/快速启动.md)
+- [本地开发启动指南](./docs/本地开发启动指南.md)
+- [DeGift 功能架构](./docs/DeGift功能架构.md)
+- [DeGift 开发进度](./docs/DeGift开发进度.md)
+- [DeGift 文件清单](./docs/DeGift文件清单.md)
 
-### Docker Compose
+## 🎯 功能概览
 
-```bash
-docker-compose up -d
-```
+### DeGift 功能
 
-## 🧪 Testing
+- ✅ **礼物创建** - 支持 Token 和 NFT 两种类型
+- ✅ **礼物展示** - 精美的礼物卡片和详情页
+- ✅ **礼物领取** - 完整的领取流程和权限验证
+- ✅ **主题系统** - 6 种精美主题可选
+- ✅ **移动端适配** - 响应式设计，触摸优化
 
-**Backend Tests:**
-```bash
-cd apps/api
-pnpm test
-```
+### 已实现功能
 
-**Smart Contract Tests:**
-```bash
-cd packages/contracts
-forge test
-```
+1. **礼物创建界面**
+   - Token/NFT 类型选择
+   - 代币选择器（ETH/USDC/DAI）
+   - NFT 选择器
+   - 接收者地址输入
+   - 礼物消息编辑
+   - 主题选择
+   - 有效期设置
 
-**Frontend E2E Tests:**
-```bash
-cd apps/web
-pnpm test:e2e
-```
+2. **礼物展示和领取**
+   - 礼物详情页
+   - 礼物卡片组件
+   - 状态管理（Active/Claimed/Expired）
+   - 领取权限验证
+   - 礼物列表和筛选
 
-## 📚 Documentation
+3. **移动端优化**
+   - 响应式布局
+   - 触摸优化
+   - 玻璃态设计
 
-- [PRD Document](./docs/红包dApp-PRD.md)
-- [Technical Implementation](./docs/技术落地方案-模块接口与伪代码.md)
-- [Development Guidelines](./docs/开发规范-Cursor开发指南.md)
+## 🔧 技术栈
 
-## 🎨 Frontend Features
+- **前端**: Next.js 14, React, TypeScript, Tailwind CSS
+- **后端**: Fastify, Prisma, PostgreSQL
+- **Web3**: wagmi, viem, RainbowKit
+- **样式**: 玻璃态设计系统
 
-### Completed Pages (12 Total)
+## 📊 开发进度
 
-**P0 Core Features:**
-- ✅ Home Page (`/`)
-- ✅ Create Lucky Packet (`/create`)
-- ✅ Create Success Page (`/create/success`)
-- ✅ Packet Details & Claim (`/packet/[id]`)
-- ✅ User Dashboard (`/dashboard`)
+| 任务 | 进度 | 状态 |
+|------|------|------|
+| ZES-77 礼物创建界面 | 70% | 🔄 基础完成 |
+| ZES-78 礼物展示和领取 | 60% | 🔄 基础完成 |
+| ZES-80 移动端适配 | 85% | ✅ 基本完成 |
 
-**P1 Growth Features:**
-- ✅ Leaderboards (`/leaderboards`)
-- ✅ Settings (`/settings`)
-- ✅ Notifications (`/notifications`)
-- ✅ Invite System (`/invite`)
-- ✅ Achievements (`/achievements`)
-- ✅ Lucky Packet Rain (`/rain`)
+## 🔄 待完成工作
 
-### Design System
-- **Primary Color**: `#FF4545`
-- **Accent Color**: `#00B8D9`
-- **Font**: Plus Jakarta Sans
-- **Style**: Glassmorphism Design
-- **Responsive**: Mobile-first approach
+- [ ] API 集成
+- [ ] 智能合约交互
+- [ ] NFT 元数据获取
+- [ ] 动画效果
+- [ ] 分享功能
 
-## 🛠️ Tech Stack
+## 👥 开发团队
 
-### Backend
-- Fastify 4
-- Prisma ORM
-- PostgreSQL
-- Redis
-- Socket.IO
-- SIWE (Sign-In with Ethereum)
-- Viem
+- **前端开发**: Ruolynn Chen
 
-### Frontend
-- Next.js 14 (App Router)
-- React 18
-- TypeScript
-- Wagmi v2
-- RainbowKit
-- TanStack Query
-- Zustand
-- Tailwind CSS
-- Framer Motion
-- Socket.IO Client
+## 📝 License
 
-### Smart Contracts
-- Solidity 0.8.20
-- Foundry
-- OpenZeppelin
-- Chainlink VRF (Random packets)
-
-## 📡 Package Management
-
-This is a pnpm workspace monorepo. All packages use `@luckypocket` scope:
-
-- `@luckypocket/api` - Backend API application
-- `@luckypocket/web` - Frontend web application
-- `@luckypocket/config` - Shared configuration (Tailwind, TypeScript)
-- `@luckypocket/ui` - Shared UI component library
-
-## 🔧 Configuration
-
-### Frontend (apps/web)
-- **Port**: 9000
-- **API URL**: http://localhost:3001
-- **Mock Wallet Mode**: Enabled by default for development
-
-### Backend (apps/api)
-- **Port**: 3001
-- **Database**: PostgreSQL (localhost:5432)
-- **Redis**: localhost:6379
-
-## 📝 Development Notes
-
-### Mock Wallet Mode
-The frontend includes a mock wallet mode for development without connecting an actual wallet:
-- Set `NEXT_PUBLIC_MOCK_WALLET=true` in `apps/web/.env.local`
-- Useful for UI development and testing
-
-### API Integration
-- Frontend is configured to connect to backend at `http://localhost:3001`
-- WebSocket connection for real-time notifications
-- SIWE authentication for wallet login
-
-## 🔒 Security
-
-### Environment Variables
-- Never commit `.env` or `.env.local` files
-- Always use `.env.example` as templates
-- Store sensitive keys securely
-
-### Smart Contracts
-- Audited OpenZeppelin contracts
-- Comprehensive test coverage
-- Chainlink VRF for provably fair randomness
-
-## 📊 Monitoring (Optional)
-
-Backend supports optional Sentry integration:
-- Set `SENTRY_DSN` environment variable
-- Optional `SENTRY_TRACES_SAMPLE_RATE` (default: 0.1)
-- Safe to run without Sentry configuration
-
-## 🤝 Contributing
-
-1. Create a feature branch from `main`
-2. Follow existing code style and conventions
-3. Write tests for new features
-4. Update documentation as needed
-5. Submit a pull request
-
-## 📄 License
-
-MIT
+Private Project
 
 ---
 
-**Built with ❤️ by the LuckyPocket Team**
+**最后更新**: 2025-11-06

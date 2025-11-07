@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { MainLayout } from '@/components/MainLayout'
 import { useAccount } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { images } from '@/lib/images'
 
 export default function ClaimPage() {
   const router = useRouter()
@@ -72,21 +74,44 @@ export default function ClaimPage() {
   return (
     <MainLayout>
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-3 xs:px-4">
-        <div className="w-full max-w-md">
-          {/* Header */}
-          <div className="text-center mb-6 xs:mb-8">
-            <div className="inline-flex items-center justify-center w-16 xs:w-20 h-16 xs:h-20 rounded-full bg-primary/10 mb-4">
-              <span className="material-symbols-outlined text-primary text-4xl xs:text-5xl">
-                redeem
-              </span>
+        {/* Enhanced Header with Background */}
+        <div className="w-full max-w-4xl mb-6 xs:mb-8">
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-accent/5 to-primary/10 p-8 xs:p-12">
+            {/* Background Image */}
+            <div className="absolute inset-0 opacity-10">
+              <Image
+                src={images.celebration.gift}
+                alt="Gift celebration"
+                fill
+                className="object-cover"
+                sizes="100vw"
+              />
             </div>
-            <h1 className="text-2xl xs:text-3xl sm:text-4xl font-black text-text-primary-light mb-2 xs:mb-3">
-              Claim Your Lucky Packet
-            </h1>
-            <p className="text-sm xs:text-base text-text-secondary-light">
-              Enter the packet ID or paste the link to claim your gift
-            </p>
+
+            {/* Decorative Elements */}
+            <div className="absolute top-4 right-4 w-20 h-20 bg-primary/20 rounded-full blur-2xl" />
+            <div className="absolute bottom-4 left-4 w-32 h-32 bg-accent/20 rounded-full blur-3xl" />
+
+            {/* Content */}
+            <div className="relative text-center">
+              <div className="inline-flex items-center justify-center w-16 xs:w-20 h-16 xs:h-20 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 backdrop-blur-xl border border-white/30 shadow-xl mb-4">
+                <span className="material-symbols-outlined text-primary text-4xl xs:text-5xl">
+                  redeem
+                </span>
+              </div>
+              <h1 className="text-2xl xs:text-3xl sm:text-4xl font-black text-text-primary-light mb-2 xs:mb-3">
+                Claim Your Lucky Packet
+              </h1>
+              <p className="text-sm xs:text-base text-text-secondary-light max-w-lg mx-auto">
+                Enter the packet ID or paste the link to claim your gift
+              </p>
+            </div>
           </div>
+        </div>
+
+        <div className="w-full max-w-md">
+          {/* Spacer to separate from wallet connection */}
+          <div className="h-4" />
 
           {/* Wallet Connection */}
           {!isConnected && (

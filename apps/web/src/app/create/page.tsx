@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { useAccount } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { MainLayout } from '@/components/MainLayout'
+import { images } from '@/lib/images'
 
 type PacketType = 'fixed' | 'random'
 type TokenType = 'ETH' | 'USDC' | 'USDT' | 'custom'
@@ -50,15 +52,40 @@ export default function CreatePacketPage() {
   return (
     <MainLayout>
       <div className="space-y-6 xs:space-y-8">
-        {/* Header */}
-        <div className="flex flex-wrap justify-between gap-3 pb-6 xs:pb-8">
-          <div className="flex min-w-0 flex-col gap-2 xs:gap-3">
-            <h1 className="text-2xl xs:text-3xl sm:text-4xl font-black text-text-primary-light leading-tight tracking-[-0.033em]">
-              Create a New Lucky Packet
-            </h1>
-            <p className="text-sm xs:text-base text-text-secondary-light">
-              Fill in the details below to share some luck with your friends.
-            </p>
+        {/* Enhanced Header with Background */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-purple-50/50 to-accent/10 mb-6 xs:mb-8 mx-3 xs:mx-4">
+          {/* Background Image */}
+          <div className="absolute inset-0 opacity-15">
+            <Image
+              src={images.technology.network}
+              alt="Digital network"
+              fill
+              className="object-cover"
+              sizes="100vw"
+            />
+          </div>
+
+          {/* Decorative Gradient Blobs */}
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/30 rounded-full blur-3xl" />
+          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-accent/30 rounded-full blur-3xl" />
+
+          {/* Content */}
+          <div className="relative flex flex-wrap justify-between items-center gap-4 p-6 xs:p-8">
+            <div className="flex min-w-0 flex-col gap-2 xs:gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 backdrop-blur-xl border border-white/30 flex items-center justify-center shadow-lg">
+                  <span className="material-symbols-outlined text-primary text-2xl">
+                    add_circle
+                  </span>
+                </div>
+                <h1 className="text-2xl xs:text-3xl sm:text-4xl font-black text-text-primary-light leading-tight tracking-[-0.033em]">
+                  Create a New Lucky Packet
+                </h1>
+              </div>
+              <p className="text-sm xs:text-base text-text-secondary-light pl-15">
+                Fill in the details below to share some luck with your friends.
+              </p>
+            </div>
           </div>
         </div>
 

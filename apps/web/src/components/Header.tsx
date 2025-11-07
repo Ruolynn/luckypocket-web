@@ -12,6 +12,7 @@ export function Header() {
   const navItems = [
     { href: '/', label: 'Home' },
     { href: '/create', label: 'Create' },
+    { href: '/claim', label: 'Claim' },
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/invite', label: 'Invite' },
   ]

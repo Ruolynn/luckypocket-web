@@ -3,47 +3,13 @@ import { MainLayout } from '@/components/MainLayout'
 import { StatsCard } from '@/components/StatsCard'
 import { PacketCard } from '@/components/PacketCard'
 import { LeaderboardPreview } from '@/components/LeaderboardPreview'
+import { EnhancedHero } from '@/components/EnhancedHero'
 
 export default function HomePage() {
   return (
     <MainLayout>
-      {/* Hero Section */}
-      <div className="flex flex-col items-center text-center gap-4 xs:gap-6 px-3 xs:px-4 py-8 xs:py-12 relative">
-        {/* Animated Icon */}
-        <div className="float-animation mb-4">
-          <div className="w-20 xs:w-24 h-20 xs:h-24 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center backdrop-blur-xl border border-white/30">
-            <span className="material-symbols-outlined text-primary text-5xl xs:text-6xl">
-              redeem
-            </span>
-          </div>
-        </div>
-
-        <h1 className="text-3xl xs:text-4xl sm:text-5xl font-black text-text-primary-light leading-tight tracking-[-0.033em]">
-          Send & Claim Lucky Packets
-        </h1>
-        <p className="text-base xs:text-lg text-text-secondary-light max-w-2xl">
-          Send and claim encrypted lucky packets on Base chain, experience the joy of Web3
-          social payments
-        </p>
-        <div className="flex flex-col xs:flex-row gap-3 xs:gap-4 mt-4">
-          <Link
-            href="/create"
-            className="glass-button flex items-center justify-center rounded-xl h-12 xs:h-14 px-6 xs:px-8 text-primary text-base xs:text-lg font-bold touch-manipulation relative overflow-hidden group ripple-effect scale-on-hover"
-          >
-            <span className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 opacity-0 group-hover:opacity-100 transition-opacity shimmer"></span>
-            <span className="material-symbols-outlined mr-2 relative z-10">redeem</span>
-            <span className="relative z-10">Create Packet</span>
-          </Link>
-          <Link
-            href="/claim"
-            className="glass-button-secondary flex items-center justify-center rounded-xl h-12 xs:h-14 px-6 xs:px-8 text-text-primary-light text-base xs:text-lg font-bold touch-manipulation relative overflow-hidden group ripple-effect scale-on-hover"
-          >
-            <span className="absolute inset-0 bg-white/30 opacity-0 group-hover:opacity-100 transition-opacity"></span>
-            <span className="material-symbols-outlined mr-2 relative z-10">qr_code_scanner</span>
-            <span className="relative z-10">Claim Packet</span>
-          </Link>
-        </div>
-      </div>
+      {/* Enhanced Hero Section with Background Image */}
+      <EnhancedHero />
 
       {/* Featured Stats */}
       <div className="grid grid-cols-2 xs:grid-cols-4 gap-3 xs:gap-4 px-3 xs:px-4">
