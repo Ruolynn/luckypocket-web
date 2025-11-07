@@ -30,10 +30,10 @@ export function Header() {
       <header className="glass sticky top-0 z-40 flex items-center justify-between whitespace-nowrap border-b border-white/20 px-3 xs:px-4 sm:px-6 md:px-8 lg:px-10 py-3 sm:py-4 backdrop-blur-xl">
         <div className="flex items-center gap-2 xs:gap-3 sm:gap-4 text-text-primary-light">
           <Link href="/" className="flex items-center gap-2 xs:gap-3 sm:gap-4 group">
-            <div className="size-5 xs:size-6 flex-shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+            <div className="size-7 xs:size-8 sm:size-9 flex-shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
               <Icons.Logo />
             </div>
-            <h2 className="text-text-primary-light text-base xs:text-lg font-bold leading-tight tracking-[-0.015em] relative">
+            <h2 className="text-text-primary-light text-lg xs:text-xl sm:text-2xl font-bold leading-tight tracking-[-0.015em] relative">
               LuckyPacket
               <Decorations.Sparkle className="absolute -top-1 -right-2 w-3 h-3 animate-[sparkle_2s_ease-in-out_infinite]" />
             </h2>
@@ -45,7 +45,7 @@ export function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className={`text-sm font-medium leading-normal transition-colors ${
+              className={`text-base font-medium leading-normal transition-colors ${
                 isActive(item.href)
                   ? 'text-primary font-bold'
                   : 'text-text-primary-light hover:text-primary'

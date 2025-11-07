@@ -1,7 +1,6 @@
 import { Header } from './Header'
 import { BottomNav } from './BottomNav'
 import { Footer } from './Footer'
-import { TestModeToggle } from './TestModeToggle'
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -18,7 +17,6 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
       </div>
       <Footer />
       <BottomNav />
-      <TestModeToggle />
     </div>
   )
 }

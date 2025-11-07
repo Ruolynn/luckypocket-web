@@ -1,5 +1,6 @@
 # ==============================================================================
 # LuckyPocket dApp - Professional .gitignore
+# Last Updated: 2025-11-07
 # ==============================================================================
 
 # ------------------------------------------------------------------------------
@@ -18,10 +19,6 @@ node_modules/
 yarn.lock
 package-lock.json
 .npm/
-
-# Ignore all node_modules (even if previously tracked)
-**/node_modules/
-node_modules/
 
 # ------------------------------------------------------------------------------
 # Environment Variables & Secrets

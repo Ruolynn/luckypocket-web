@@ -1,23 +1,13 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
-import { images } from '@/lib/images'
 
 export function EnhancedHero() {
   return (
     <div className="relative overflow-hidden rounded-2xl mb-6 mx-3 xs:mx-4">
-      {/* Background Image with Overlay */}
+      {/* Background with Gradients */}
       <div className="absolute inset-0">
-        <Image
-          src={images.hero.community}
-          alt="Community celebration"
-          fill
-          className="object-cover opacity-50"
-          priority
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/20" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary-dark to-accent" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
       </div>
 

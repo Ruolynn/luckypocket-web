@@ -96,10 +96,22 @@ export const Icons = {
       <line x1="20" y1="44" x2="32" y2="36" stroke="url(#logoGoldGradient)" strokeWidth="0.5" opacity="0.4" />
       <line x1="44" y1="44" x2="32" y2="36" stroke="url(#logoGoldGradient)" strokeWidth="0.5" opacity="0.4" />
 
-      {/* 顶部闪光效果 */}
-      <circle cx="38" cy="14" r="2" fill="white" opacity="0.9" />
-      <circle cx="34" cy="12" r="1" fill="white" opacity="0.7" />
-      <circle cx="30" cy="13" r="1.5" fill="#FFE57F" opacity="0.8" />
+      {/* 金色闪光星星装饰 - 右上角 */}
+      {/* 大星星 */}
+      <g transform="translate(52, 12)">
+        <path d="M 0,-4 L 1,-1 L 4,0 L 1,1 L 0,4 L -1,1 L -4,0 L -1,-1 Z" fill="url(#logoGoldGradient)" opacity="0.95" />
+        <path d="M 0,-3 L 0.8,-0.8 L 3,0 L 0.8,0.8 L 0,3 L -0.8,0.8 L -3,0 L -0.8,-0.8 Z" fill="#FFF" opacity="0.6" />
+      </g>
+
+      {/* 小星星 */}
+      <g transform="translate(56, 20)">
+        <path d="M 0,-2.5 L 0.6,-0.6 L 2.5,0 L 0.6,0.6 L 0,2.5 L -0.6,0.6 L -2.5,0 L -0.6,-0.6 Z" fill="url(#logoGoldGradient)" opacity="0.9" />
+      </g>
+
+      {/* 小星星2 */}
+      <g transform="translate(48, 6)">
+        <path d="M 0,-2 L 0.5,-0.5 L 2,0 L 0.5,0.5 L 0,2 L -0.5,0.5 L -2,0 L -0.5,-0.5 Z" fill="#FFD700" opacity="0.85" />
+      </g>
     </svg>
   ),
 

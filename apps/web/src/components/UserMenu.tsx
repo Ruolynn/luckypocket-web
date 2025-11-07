@@ -7,27 +7,11 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 export function UserMenu() {
-  const { isConnected: realIsConnected, address: realAddress } = useAccount()
+  const { isConnected, address } = useAccount()
   const { disconnect } = useDisconnect()
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
-  const [isTestMode, setIsTestMode] = useState(false)
-  const [mockConnected, setMockConnected] = useState(false)
-
-  // Check test mode
-  useEffect(() => {
-    const testMode = localStorage.getItem('testMode') === 'true'
-    const mockWallet = localStorage.getItem('mockWalletConnected') === 'true'
-    setIsTestMode(testMode)
-    setMockConnected(mockWallet)
-  }, [])
-
-  // Use test mode values or real values
-  const isConnected = isTestMode ? mockConnected : realIsConnected
-  const address = isTestMode
-    ? (mockConnected ? '0x1234567890123456789012345678901234567890' : undefined)
-    : realAddress
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -150,16 +134,8 @@ export function UserMenu() {
           {/* Disconnect */}
           <button
             onClick={() => {
-              if (isTestMode) {
-                localStorage.setItem('mockWalletConnected', 'false')
-                setMockConnected(false)
-              } else {
-                disconnect()
-              }
+              disconnect()
               setIsOpen(false)
-              if (isTestMode) {
-                window.location.reload()
-              }
             }}
             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
           >
