@@ -313,7 +313,9 @@ test-data/
 # ==============================================================================
 # Linear sync results (may contain sensitive info)
 apps/api/scripts/tasks.linear.result.json
+apps/api/scripts/project-status-report.json
 **/tasks.linear.result.json
+**/project-status-report.json
 
 # Temporary Linear scripts
 apps/api/scripts/check-*.ts

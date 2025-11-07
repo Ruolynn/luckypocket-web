@@ -272,3 +272,24 @@ model PacketClaim {
   @@index([claimedAt])
   @@map("packet_claims")
 }
+
+// ============================================
+// Socket.IO Security Models
+// ============================================
+
+model SocketSecurityEvent {
+  id        String   @id @default(cuid())
+  type      String // SecurityEventType enum
+  userId    String?
+  socketId  String
+  ip        String
+  userAgent String?
+  details   Json? // Additional event details
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([type, createdAt])
+  @@index([ip, createdAt])
+  @@index([socketId])
+  @@map("socket_security_events")
+}
