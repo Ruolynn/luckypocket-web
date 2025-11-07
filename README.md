@@ -1,110 +1,128 @@
-# LuckyPocket - DeGift 礼物功能
+# 🧧 Lucky Packet
 
-去中心化礼物系统，支持发送 Token 和 NFT 作为礼物。
+A decentralized lucky packet (red envelope) dApp built on Base blockchain. Send and receive encrypted lucky packets with Web3 social payment experience.
 
-## 🚀 快速启动
+## ✨ Features
 
-### 端口配置
+- 🎁 **Create Lucky Packets** - Send crypto lucky packets to friends and community
+- 🔍 **Claim Packets** - Discover and claim available lucky packets
+- 📊 **Dashboard** - Track your sent and received packets
+- 👥 **Invite & Earn** - Share with friends and earn rewards
+- 🏆 **Achievements** - Unlock badges and show off your activity
+- 📱 **Mobile Optimized** - Responsive design with touch-friendly UI
 
-| 服务 | 端口 | 说明 |
-|------|------|------|
-| Web 前端 | 9002 | Next.js 开发服务器 |
-| API 后端 | 9001 | Fastify API 服务器 |
+## 🚀 Quick Start
 
-> **注意**: 端口 9000 已被 HKD 项目占用
+### Prerequisites
 
-### 启动服务
+- Node.js 18+
+- pnpm
+- PostgreSQL
+- Redis
 
-**终端 1 - 启动 API**:
+### Installation
+
+```bash
+# Install dependencies
+pnpm install
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your configuration
+```
+
+### Development
+
+Start both frontend and backend in separate terminals:
+
+**Terminal 1 - API Server**
 ```bash
 cd apps/api
 pnpm dev
+# API runs on http://localhost:9001
 ```
 
-**终端 2 - 启动 Web**:
+**Terminal 2 - Web App**
 ```bash
 cd apps/web
 pnpm dev
+# Web app runs on http://localhost:9003
 ```
 
-### 访问应用
+### Access Application
 
-- 🌐 Web 应用: http://localhost:9002
-- 🎁 创建礼物: http://localhost:9002/gift/create
-- 📋 礼物列表: http://localhost:9002/gifts
+- 🌐 Web App: http://localhost:9003
+- 🔌 API Server: http://localhost:9001
 
-## 📚 文档
+## 🏗️ Tech Stack
 
-- [快速启动指南](./docs/快速启动.md)
-- [本地开发启动指南](./docs/本地开发启动指南.md)
-- [DeGift 功能架构](./docs/DeGift功能架构.md)
-- [DeGift 开发进度](./docs/DeGift开发进度.md)
-- [DeGift 文件清单](./docs/DeGift文件清单.md)
-
-## 🎯 功能概览
-
-### DeGift 功能
-
-- ✅ **礼物创建** - 支持 Token 和 NFT 两种类型
-- ✅ **礼物展示** - 精美的礼物卡片和详情页
-- ✅ **礼物领取** - 完整的领取流程和权限验证
-- ✅ **主题系统** - 6 种精美主题可选
-- ✅ **移动端适配** - 响应式设计，触摸优化
-
-### 已实现功能
-
-1. **礼物创建界面**
-   - Token/NFT 类型选择
-   - 代币选择器（ETH/USDC/DAI）
-   - NFT 选择器
-   - 接收者地址输入
-   - 礼物消息编辑
-   - 主题选择
-   - 有效期设置
-
-2. **礼物展示和领取**
-   - 礼物详情页
-   - 礼物卡片组件
-   - 状态管理（Active/Claimed/Expired）
-   - 领取权限验证
-   - 礼物列表和筛选
-
-3. **移动端优化**
-   - 响应式布局
-   - 触摸优化
-   - 玻璃态设计
-
-## 🔧 技术栈
-
-- **前端**: Next.js 14, React, TypeScript, Tailwind CSS
-- **后端**: Fastify, Prisma, PostgreSQL
+### Frontend
+- **Framework**: Next.js 14 with React 18
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS with custom design system
 - **Web3**: wagmi, viem, RainbowKit
-- **样式**: 玻璃态设计系统
+- **Icons**: Custom SVG icon library with festive themes
 
-## 📊 开发进度
+### Backend
+- **Framework**: Fastify
+- **Database**: PostgreSQL with Prisma ORM
+- **Cache**: Redis
+- **Authentication**: Sign-In with Ethereum (SIWE)
 
-| 任务 | 进度 | 状态 |
-|------|------|------|
-| ZES-77 礼物创建界面 | 70% | 🔄 基础完成 |
-| ZES-78 礼物展示和领取 | 60% | 🔄 基础完成 |
-| ZES-80 移动端适配 | 85% | ✅ 基本完成 |
+### Smart Contracts
+- **Chain**: Base Sepolia (testnet)
+- **Contracts**: RedPacket.sol for packet management
 
-## 🔄 待完成工作
+## 📁 Project Structure
 
-- [ ] API 集成
-- [ ] 智能合约交互
-- [ ] NFT 元数据获取
-- [ ] 动画效果
-- [ ] 分享功能
+```
+luckypocket/
+├── apps/
+│   ├── api/          # Fastify backend
+│   └── web/          # Next.js frontend
+├── packages/
+│   └── contracts/    # Smart contracts
+├── docs/             # Documentation
+└── scripts/          # Utility scripts
+```
 
-## 👥 开发团队
+## 🎨 Design System
 
-- **前端开发**: Ruolynn Chen
+Our UI features a festive, Web3-friendly design:
+
+- **Glass morphism** effects
+- **Custom icons** with Chinese New Year themes
+- **Cryptocurrency icons** with official brand colors
+- **Responsive layouts** optimized for mobile and desktop
+- **Smooth animations** and transitions
+
+## 🔐 Security
+
+- SIWE authentication for wallet-based login
+- JWT tokens for session management
+- Rate limiting on API endpoints
+- Input validation and sanitization
+
+## 📖 Documentation
+
+- [API Integration Guide](./docs/API-Integration-Guide.md)
+- [Red Packet dApp PRD](./docs/红包dApp-PRD.md)
+- [Technical Implementation](./docs/技术落地方案-模块接口与伪代码.md)
+- [Base Documentation](./docs/Base-RedPacket-dApp-Complete-Documentation.md)
+
+## 🤝 Contributing
+
+This is a private project. Please contact the team for contribution guidelines.
 
 ## 📝 License
 
-Private Project
+Private & Proprietary
+
+## 👥 Team
+
+- **Frontend**: Ruolynn Chen
+- **Organization**: Zesty Studio
 
 ---
 
-**最后更新**: 2025-11-06
+**Last Updated**: 2025-11-07

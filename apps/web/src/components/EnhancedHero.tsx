@@ -13,16 +13,16 @@ export function EnhancedHero() {
           src={images.hero.community}
           alt="Community celebration"
           fill
-          className="object-cover opacity-20"
+          className="object-cover opacity-50"
           priority
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-transparent to-accent/30" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
       </div>
 
       {/* Content */}
-      <div className="relative flex flex-col items-center text-center gap-4 xs:gap-6 px-4 xs:px-6 py-12 xs:py-16 backdrop-blur-sm">
+      <div className="relative flex flex-col items-center text-center gap-4 xs:gap-6 px-4 xs:px-6 py-12 xs:py-16">
         {/* Animated Icon */}
         <div className="float-animation mb-4">
           <div className="w-20 xs:w-24 h-20 xs:h-24 rounded-full bg-gradient-to-br from-primary/40 to-accent/40 flex items-center justify-center backdrop-blur-xl border border-white/30 shadow-2xl">

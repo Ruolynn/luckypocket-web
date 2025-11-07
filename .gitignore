@@ -342,3 +342,41 @@ Linear集成完成报告.md
 .monitor.pid
 logs/
 summary.json
+
+# ==============================================================================
+# Generated Documentation & Reports (Keep in .gitignore)
+# ==============================================================================
+# Linear status reports
+LINEAR_PROJECT_STATUS*.md
+degift-project-status*.md
+degift-project-status*.json
+PROJECT_PROGRESS_SUMMARY.md
+PROJECT_STATUS*.md
+
+# Implementation reports
+ZES-*-COMPLETION-SUMMARY.md
+ZES-*-IMPLEMENTATION-PLAN.md
+ZES-*-Part-*.md
+IMPLEMENTATION_REPORT.md
+
+# Deployment guides (keep template versions only)
+ENV_SETUP.md
+LOCAL_SETUP.md
+DEPLOYMENT_STATUS.md
+VERCEL_DEPLOYMENT_GUIDE.md
+
+# Monitoring & Chinese docs
+README-监控使用.md
+启动命令.sh
+
+# DeGift related (if not used)
+docs/DeGift*.md
+
+# ==============================================================================
+# Gift Feature (If Deprecated)
+# ==============================================================================
+apps/web/src/app/gift/
+apps/web/src/app/gifts/
+apps/web/src/components/gift/
+apps/web/src/lib/gift-types.ts
+apps/web/src/lib/images.ts

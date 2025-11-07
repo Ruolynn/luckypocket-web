@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { UserMenu } from './UserMenu'
+import { Icons, Decorations } from '@/lib/icons'
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -28,31 +29,13 @@ export function Header() {
     <>
       <header className="glass sticky top-0 z-40 flex items-center justify-between whitespace-nowrap border-b border-white/20 px-3 xs:px-4 sm:px-6 md:px-8 lg:px-10 py-3 sm:py-4 backdrop-blur-xl">
         <div className="flex items-center gap-2 xs:gap-3 sm:gap-4 text-text-primary-light">
-          <Link href="/" className="flex items-center gap-2 xs:gap-3 sm:gap-4">
-            <div className="size-5 xs:size-6 text-primary flex-shrink-0">
-              <svg
-                fill="none"
-                viewBox="0 0 48 48"
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-full h-full"
-              >
-                <g clipPath="url(#clip0_6_330)">
-                  <path
-                    clipRule="evenodd"
-                    d="M24 0.757355L47.2426 24L24 47.2426L0.757355 24L24 0.757355ZM21 35.7574V12.2426L9.24264 24L21 35.7574Z"
-                    fill="currentColor"
-                    fillRule="evenodd"
-                  ></path>
-                </g>
-                <defs>
-                  <clipPath id="clip0_6_330">
-                    <rect fill="white" height="48" width="48"></rect>
-                  </clipPath>
-                </defs>
-              </svg>
+          <Link href="/" className="flex items-center gap-2 xs:gap-3 sm:gap-4 group">
+            <div className="size-5 xs:size-6 flex-shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+              <Icons.Logo />
             </div>
-            <h2 className="text-text-primary-light text-base xs:text-lg font-bold leading-tight tracking-[-0.015em]">
+            <h2 className="text-text-primary-light text-base xs:text-lg font-bold leading-tight tracking-[-0.015em] relative">
               LuckyPacket
+              <Decorations.Sparkle className="absolute -top-1 -right-2 w-3 h-3 animate-[sparkle_2s_ease-in-out_infinite]" />
             </h2>
           </Link>
         </div>

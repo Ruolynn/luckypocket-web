@@ -7,6 +7,7 @@ import { useAccount } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { MainLayout } from '@/components/MainLayout'
 import { images } from '@/lib/images'
+import { Icons, Decorations } from '@/lib/icons'
 
 type PacketType = 'fixed' | 'random'
 type TokenType = 'ETH' | 'USDC' | 'USDT' | 'custom'
@@ -73,13 +74,14 @@ export default function CreatePacketPage() {
           <div className="relative flex flex-wrap justify-between items-center gap-4 p-6 xs:p-8">
             <div className="flex min-w-0 flex-col gap-2 xs:gap-3">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 backdrop-blur-xl border border-white/30 flex items-center justify-center shadow-lg">
-                  <span className="material-symbols-outlined text-primary text-2xl">
-                    add_circle
-                  </span>
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 backdrop-blur-xl border border-white/30 flex items-center justify-center shadow-lg animate-[festive-bounce_1s_ease-in-out_infinite]">
+                  <div className="w-7 h-7">
+                    <Icons.RedPacket />
+                  </div>
                 </div>
-                <h1 className="text-2xl xs:text-3xl sm:text-4xl font-black text-text-primary-light leading-tight tracking-[-0.033em]">
+                <h1 className="text-2xl xs:text-3xl sm:text-4xl font-black text-text-primary-light leading-tight tracking-[-0.033em] relative">
                   Create a New Lucky Packet
+                  <Decorations.Sparkle className="absolute -top-1 -right-3 w-4 h-4" />
                 </h1>
               </div>
               <p className="text-sm xs:text-base text-text-secondary-light pl-15">
@@ -96,10 +98,10 @@ export default function CreatePacketPage() {
           </h3>
           {!isConnected ? (
             <div className="glass-card flex flex-col items-center justify-center gap-3 xs:gap-4 rounded-lg border border-dashed border-white/30 p-4 xs:p-6 text-center">
-              <div className="flex size-10 xs:size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-                <span className="material-symbols-outlined text-2xl xs:text-3xl">
-                  account_balance_wallet
-                </span>
+              <div className="flex size-10 xs:size-12 items-center justify-center rounded-full bg-primary/10">
+                <div className="w-6 xs:w-7 h-6 xs:h-7">
+                  <Icons.Wallet />
+                </div>
               </div>
               <p className="text-sm xs:text-base font-medium text-text-primary-light">
                 Your wallet is not connected
@@ -113,7 +115,9 @@ export default function CreatePacketPage() {
             <div className="glass-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-lg p-4">
               <div className="flex items-center gap-3">
                 <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="material-symbols-outlined text-primary">account_balance_wallet</span>
+                  <div className="w-6 h-6">
+                    <Icons.Wallet />
+                  </div>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-text-primary-light">
@@ -144,9 +148,9 @@ export default function CreatePacketPage() {
                       : 'text-text-secondary-light'
                   }`}
                 >
-                  <span className="material-symbols-outlined text-base xs:text-lg">
-                    monetization_on
-                  </span>
+                  <div className="w-4 h-4">
+                    <Icons.Coin />
+                  </div>
                   <span className="truncate text-xs xs:text-sm font-medium">Fixed Amount</span>
                   <input
                     type="radio"
@@ -164,7 +168,9 @@ export default function CreatePacketPage() {
                       : 'text-text-secondary-light'
                   }`}
                 >
-                  <span className="material-symbols-outlined text-base xs:text-lg">casino</span>
+                  <div className="w-4 h-4">
+                    <Icons.Fire />
+                  </div>
                   <span className="truncate text-xs xs:text-sm font-medium">Random Amount</span>
                   <input
                     type="radio"

@@ -7,6 +7,7 @@ import { MainLayout } from '@/components/MainLayout'
 import { useAccount } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { images } from '@/lib/images'
+import { Icons, Decorations } from '@/lib/icons'
 
 export default function ClaimPage() {
   const router = useRouter()
@@ -94,13 +95,14 @@ export default function ClaimPage() {
 
             {/* Content */}
             <div className="relative text-center">
-              <div className="inline-flex items-center justify-center w-16 xs:w-20 h-16 xs:h-20 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 backdrop-blur-xl border border-white/30 shadow-xl mb-4">
-                <span className="material-symbols-outlined text-primary text-4xl xs:text-5xl">
-                  redeem
-                </span>
+              <div className="inline-flex items-center justify-center w-16 xs:w-20 h-16 xs:h-20 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 backdrop-blur-xl border border-white/30 shadow-xl mb-4 animate-[festive-bounce_1s_ease-in-out_infinite]">
+                <div className="w-10 xs:w-12 h-10 xs:h-12">
+                  <Icons.GiftBox />
+                </div>
               </div>
-              <h1 className="text-2xl xs:text-3xl sm:text-4xl font-black text-text-primary-light mb-2 xs:mb-3">
+              <h1 className="text-2xl xs:text-3xl sm:text-4xl font-black text-text-primary-light mb-2 xs:mb-3 relative inline-block">
                 Claim Your Lucky Packet
+                <Decorations.Sparkle className="absolute -top-1 -right-4 w-4 h-4" />
               </h1>
               <p className="text-sm xs:text-base text-text-secondary-light max-w-lg mx-auto">
                 Enter the packet ID or paste the link to claim your gift
@@ -204,9 +206,9 @@ export default function ClaimPage() {
                 onClick={() => router.push('/create')}
                 className="glass-card-gradient flex flex-col items-center gap-2 p-4 rounded-lg scale-on-hover touch-manipulation group"
               >
-                <span className="material-symbols-outlined text-primary text-2xl transition-transform group-hover:scale-110">
-                  add_circle
-                </span>
+                <div className="w-8 h-8 transition-transform group-hover:scale-110 group-hover:animate-[festive-bounce_0.6s_ease-in-out_infinite]">
+                  <Icons.RedPacket />
+                </div>
                 <span className="text-xs xs:text-sm font-medium text-text-primary-light">
                   Create Packet
                 </span>
@@ -215,9 +217,9 @@ export default function ClaimPage() {
                 onClick={() => router.push('/dashboard')}
                 className="glass-card-gradient flex flex-col items-center gap-2 p-4 rounded-lg scale-on-hover touch-manipulation group"
               >
-                <span className="material-symbols-outlined text-primary text-2xl transition-transform group-hover:scale-110">
-                  dashboard
-                </span>
+                <div className="w-8 h-8 transition-transform group-hover:scale-110">
+                  <Icons.Wallet />
+                </div>
                 <span className="text-xs xs:text-sm font-medium text-text-primary-light">
                   My Packets
                 </span>

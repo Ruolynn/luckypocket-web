@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Icons, Decorations } from '@/lib/icons'
 
 interface PacketCardProps {
   title: string
@@ -21,34 +22,43 @@ export function PacketCard({
 }: PacketCardProps) {
   const isClaimed = status === 'claimed'
 
+  // Determine which icon to use
+  const isGift = title.includes('Congratulations') || title.includes('Gift')
+  const IconComponent = isGift ? Icons.GiftBox : Icons.RedPacket
+
   return (
     <div
-      className={`glass-card flex flex-col sm:flex-row gap-3 xs:gap-4 rounded-xl px-4 xs:px-6 py-4 transition-all ${
+      className={`glass-card flex flex-col sm:flex-row gap-3 xs:gap-4 rounded-xl px-4 xs:px-6 py-4 transition-all hover:shadow-lg group ${
         isClaimed ? 'opacity-60' : ''
       }`}
     >
       <div className="flex items-center gap-3 xs:gap-4 flex-1 min-w-0">
         <div
-          className={`material-symbols-outlined flex items-center justify-center rounded-lg shrink-0 size-12 xs:size-14 text-2xl xs:text-3xl ${
+          className={`flex items-center justify-center rounded-lg shrink-0 size-12 xs:size-14 transition-all ${
             isClaimed
-              ? 'text-gray-400 bg-gray-500/10'
-              : title.includes('Congratulations')
-                ? 'text-green-400 bg-green-500/10'
-                : 'text-accent bg-accent/20'
+              ? 'bg-gray-500/10'
+              : isGift
+                ? 'bg-green-500/10 group-hover:scale-110 group-hover:animate-[festive-bounce_0.6s_ease-in-out_infinite]'
+                : 'bg-accent/20 group-hover:scale-110 group-hover:animate-[shake_0.5s_ease-in-out_infinite]'
           }`}
         >
-          {title.includes('Congratulations') ? 'card_giftcard' : 'redeem'}
+          <div className={`w-8 xs:w-9 h-8 xs:h-9 ${isClaimed ? 'opacity-40' : ''}`}>
+            <IconComponent />
+          </div>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-base xs:text-lg font-bold text-text-primary-light truncate mb-1">
+          <p className="text-base xs:text-lg font-bold text-text-primary-light truncate mb-1 flex items-center gap-2">
             {title}
+            {!isClaimed && <Decorations.Sparkle className="w-3 h-3 flex-shrink-0" />}
           </p>
           <p className="text-xs xs:text-sm text-text-secondary-light line-clamp-2">
             {description}
           </p>
           <div className="flex items-center gap-3 xs:gap-4 mt-2 text-xs xs:text-sm text-text-secondary-light">
             <span className="flex items-center gap-1">
-              <span className="material-symbols-outlined text-base">attach_money</span>
+              <div className="w-4 h-4">
+                <Icons.Coin />
+              </div>
               <span>{amount}</span>
             </span>
             <span className="flex items-center gap-1">

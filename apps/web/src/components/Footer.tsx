@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { Icons } from '@/lib/icons'
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
@@ -100,20 +101,34 @@ export function Footer() {
                 Community
               </h3>
               <div className="flex flex-wrap gap-3">
-                {footerLinks.social.map((link) => (
-                  <a
-                    key={link.href}
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-surface-light hover:bg-primary/10 transition-colors group"
-                    title={link.label}
-                  >
-                    <span className="material-symbols-outlined text-base text-text-secondary-light group-hover:text-primary transition-colors">
-                      {link.icon === 'X' ? 'alternate_email' : link.icon === 'Discord' ? 'forum' : link.icon === 'Telegram' ? 'send' : 'code'}
-                    </span>
-                  </a>
-                ))}
+                {footerLinks.social.map((link) => {
+                  // 根据社交媒体类型选择对应的彩色图标
+                  const getIconComponent = () => {
+                    switch(link.icon) {
+                      case 'X': return Icons.TwitterIcon
+                      case 'Discord': return Icons.DiscordIcon
+                      case 'Telegram': return Icons.TelegramIcon
+                      case 'GitHub': return Icons.GitHubIcon
+                      default: return Icons.Share
+                    }
+                  }
+                  const IconComponent = getIconComponent()
+
+                  return (
+                    <a
+                      key={link.href}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center w-10 h-10 rounded-full hover:scale-110 transition-transform group"
+                      title={link.label}
+                    >
+                      <div className="w-10 h-10">
+                        <IconComponent />
+                      </div>
+                    </a>
+                  )
+                })}
               </div>
               <div className="mt-4">
                 <p className="text-xs text-text-secondary-light">
@@ -129,10 +144,8 @@ export function Footer() {
           {/* Bottom Footer */}
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                <span className="material-symbols-outlined text-primary text-xl">
-                  redeem
-                </span>
+              <div className="w-8 h-8">
+                <Icons.Logo />
               </div>
               <span className="text-sm font-bold text-text-primary-light">
                 Lucky Packet
